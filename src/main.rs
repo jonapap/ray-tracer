@@ -9,6 +9,7 @@ use crate::hit::sphere::Sphere;
 use crate::hit::*;
 use crate::ray::Ray;
 use rand::Rng;
+use rayon::prelude::*;
 
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     if depth <= 0 {
@@ -53,20 +54,22 @@ fn main() {
     println!("{} {}", image_width, image_height);
     println!("255");
 
-    let mut rng = rand::thread_rng();
-
     for j in (0..(image_height - 1)).rev() {
         eprintln!("Scanlines remaining: {}", j);
         for i in 0..image_width {
-            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-            for _ in 0..samples_per_pixel {
-                let ran = rng.gen::<f64>();
-                let u = ((i as f64) + rng.gen::<f64>()) / (image_width - 1) as f64;
-                let v = ((j as f64) + rng.gen::<f64>()) / (image_height - 1) as f64;
+            let pixel_color = (0..samples_per_pixel)
+                .into_iter()
+                .map(|_| {
+                    let mut rng = rand::thread_rng();
 
-                let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world, max_depth);
-            }
+                    let u = ((i as f64) + rng.gen::<f64>()) / (image_width - 1) as f64;
+                    let v = ((j as f64) + rng.gen::<f64>()) / (image_height - 1) as f64;
+
+                    let r = cam.get_ray(u, v);
+                    ray_color(&r, &world, max_depth)
+                })
+                .sum();
+
             write_color(pixel_color, samples_per_pixel);
         }
     }
