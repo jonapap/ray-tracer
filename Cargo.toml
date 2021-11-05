@@ -8,3 +8,5 @@ edition = "2018"
 
 [dependencies]
 cgmath = "0.18.0"
+derive-new = "0.5.9"
+rand = "0.8.0"
