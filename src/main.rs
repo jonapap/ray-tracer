@@ -1,16 +1,13 @@
-mod color;
-mod hittable;
+mod base;
+mod hit;
 mod ray;
-mod vec3;
 
-use crate::color::{write_color, Color};
-use crate::hittable::*;
+use crate::base::*;
+use crate::hit::sphere::Sphere;
+use crate::hit::*;
 use crate::ray::Ray;
-use crate::vec3::unit_vector;
-use crate::vec3::Vec3;
-use cgmath::{InnerSpace, Vector3};
 
-fn ray_color(r: &Ray, world: &Hittable) -> Color {
+fn ray_color(r: &Ray, world: &dyn Hittable) -> Color {
     match world.hit(r, 0.0, f64::INFINITY) {
         Some(rec) => 0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0)),
         None => {
@@ -41,11 +38,11 @@ fn main() {
     let viewport_width = aspect_ratio * viewport_height;
     let focal_length = 1.0;
 
-    let origin = Vector3::new(0.0, 0.0, 0.0);
-    let horizontal = Vector3::new(viewport_width, 0.0, 0.0);
-    let vertical = Vector3::new(0.0, viewport_height, 0.0);
+    let origin = Vec3::new(0.0, 0.0, 0.0);
+    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
+    let vertical = Vec3::new(0.0, viewport_height, 0.0);
     let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - Vector3::new(0.0, 0.0, focal_length);
+        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
     println!("P3");
     println!("{} {}", image_width, image_height);
