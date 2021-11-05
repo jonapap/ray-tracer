@@ -9,5 +9,7 @@ edition = "2018"
 [dependencies]
 cgmath = "0.18.0"
 derive-new = "0.5.9"
-rand = "0.8.0"
+rand = {version = "0.8.0", features = ["small_rng"]}
 rayon = "1.5"
+itertools = "0.10.1"
+indicatif = {version = "0.16.0", features = ["rayon"]}

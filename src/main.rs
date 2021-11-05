@@ -8,6 +8,8 @@ use crate::camera::Camera;
 use crate::hit::sphere::Sphere;
 use crate::hit::*;
 use crate::ray::Ray;
+use indicatif::{ParallelProgressIterator, ProgressBar};
+use itertools::Itertools;
 use rand::Rng;
 use rayon::prelude::*;
 
@@ -54,24 +56,33 @@ fn main() {
     println!("{} {}", image_width, image_height);
     println!("255");
 
-    for j in (0..(image_height - 1)).rev() {
-        eprintln!("Scanlines remaining: {}", j);
-        for i in 0..image_width {
-            let pixel_color = (0..samples_per_pixel)
-                .into_iter()
-                .map(|_| {
-                    let mut rng = rand::thread_rng();
+    let bar = ProgressBar::new((image_height * image_width) as u64);
+    bar.set_style(indicatif::ProgressStyle::default_bar().progress_chars("=> "));
 
+    let pixels: Vec<Color> = (0..(image_height - 1))
+        .rev()
+        .cartesian_product(0..image_width)
+        .collect::<Vec<_>>()
+        .into_par_iter()
+        // .progress_with(bar)
+        .map(|(j, i)| {
+            let mut rng = rand::thread_rng();
+
+            (0..samples_per_pixel)
+                // .into_iter()
+                .map(|_| {
                     let u = ((i as f64) + rng.gen::<f64>()) / (image_width - 1) as f64;
                     let v = ((j as f64) + rng.gen::<f64>()) / (image_height - 1) as f64;
 
                     let r = cam.get_ray(u, v);
                     ray_color(&r, &world, max_depth)
                 })
-                .sum();
+                .sum()
+        })
+        .collect();
 
-            write_color(pixel_color, samples_per_pixel);
-        }
+    for i in pixels {
+        write_color(i, samples_per_pixel);
     }
 
     eprintln!("Done!");

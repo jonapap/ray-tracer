@@ -1,7 +1,13 @@
 use cgmath::num_traits::clamp;
 use cgmath::{InnerSpace, Vector3};
-use rand::Rng;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
+use std::cell::RefCell;
 use std::ops::Range;
+
+thread_local! {
+    pub static RNG: RefCell<SmallRng> = RefCell::new(SmallRng::seed_from_u64(123123));
+}
 
 pub type Color = Vector3<f64>;
 
@@ -28,19 +34,22 @@ pub fn write_color(pixel_color: Color, samples_per_pixel: u32) {
 }
 
 fn random_vector() -> Vec3 {
-    let mut rng = rand::thread_rng();
+    RNG.with(|rng| {
+        let mut rng = rng.borrow_mut();
 
-    Vec3::new(rng.gen(), rng.gen(), rng.gen())
+        Vec3::new(rng.gen(), rng.gen(), rng.gen())
+    })
 }
 
 fn random_vector_range(r: Range<f64>) -> Vec3 {
-    let mut rng = rand::thread_rng();
-
-    Vec3::new(
-        rng.gen_range(r.clone()),
-        rng.gen_range(r.clone()),
-        rng.gen_range(r.clone()),
-    )
+    RNG.with(|rng| {
+        let mut rng = rng.borrow_mut();
+        Vec3::new(
+            rng.gen_range(r.clone()),
+            rng.gen_range(r.clone()),
+            rng.gen_range(r.clone()),
+        )
+    })
 }
 
 pub fn random_in_unit_sphere() -> Vec3 {
