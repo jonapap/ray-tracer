@@ -4,7 +4,7 @@ use cgmath::dot;
 
 pub struct HitRecord {
     pub t: f64,
-    pub point: Vec3,
+    pub p: Vec3,
     pub normal: Vec3,
     front_face: Option<bool>,
 }
@@ -18,7 +18,7 @@ impl HitRecord {
         outward_normal: &Vec3,
     ) -> HitRecord {
         let tmp = HitRecord {
-            point,
+            p: point,
             normal,
             t,
             front_face: None,
