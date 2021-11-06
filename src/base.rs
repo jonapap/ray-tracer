@@ -95,3 +95,17 @@ pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
         -in_unit_sphere
     }
 }
+
+pub fn is_near_zero(vec: &Vec3) -> bool {
+    let s = 1e-8;
+
+    (vec.x.abs() < s) && (vec.y.abs() < s) && (vec.z.abs() < s)
+}
+
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    v - 2.0 * dot(*v, *n) * n
+}
+
+pub fn multiply_colors(c1: &Color, c2: &Color) -> Color {
+    Color::new(c1.x * c2.x, c1.y * c2.y, c1.z * c2.z)
+}

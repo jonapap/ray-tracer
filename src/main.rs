@@ -1,12 +1,15 @@
 mod base;
 mod camera;
 mod hit;
+mod materials;
 mod ray;
 
 use crate::base::*;
 use crate::camera::Camera;
 use crate::hit::sphere::Sphere;
 use crate::hit::*;
+use crate::materials::lambertian::Lambertian;
+use crate::materials::metal::Metal;
 use crate::ray::Ray;
 use indicatif::{ParallelProgressIterator, ProgressBar};
 use itertools::Itertools;
@@ -20,12 +23,10 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     }
 
     match world.hit(r, 0.001, f64::INFINITY) {
-        Some(rec) => {
-            // let target = rec.p + rec.normal + random_unit_vector();
-            let target = rec.p + random_in_hemisphere(&rec.normal);
-
-            0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
-        }
+        Some(rec) => match rec.material.scatter(r, &rec) {
+            Some(scatter) => multiply_colors(&scatter.0, &ray_color(&scatter.1, world, depth - 1)),
+            None => Color::new(0.0, 0.0, 0.0),
+        },
         None => {
             let unit_direction = unit_vector(&r.direction);
             let t = 0.5 * (unit_direction.y + 1.0);
@@ -39,7 +40,7 @@ fn main() {
     // Image
 
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 400;
+    let image_width = 400 * 5;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
     let samples_per_pixel = 100;
     let max_depth = 50;
@@ -47,8 +48,32 @@ fn main() {
     // World
 
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+
+    let material_ground = Lambertian::new(Color::new(0.8, 0.8, 0.0));
+    let material_center = Lambertian::new(Color::new(0.7, 0.3, 0.3));
+    let material_left = Metal::new(Color::new(0.8, 0.8, 0.8), 0.3);
+    let material_right = Metal::new(Color::new(0.8, 0.6, 0.2), 1.0);
+
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
+    )));
 
     // Camera
 

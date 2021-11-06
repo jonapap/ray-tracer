@@ -1,36 +1,40 @@
 use crate::base::Vec3;
+use crate::materials::Material;
 use crate::ray::Ray;
 use cgmath::dot;
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub t: f64,
     pub p: Vec3,
     pub normal: Vec3,
-    front_face: Option<bool>,
+    pub material: &'a dyn Material,
+    front_face: bool,
 }
 
-impl HitRecord {
-    pub fn new_with_face_normal(
+impl<'a> HitRecord<'a> {
+    pub fn new(
         t: f64,
         point: Vec3,
         normal: Vec3,
+        material: &'a dyn Material,
         r: &Ray,
         outward_normal: &Vec3,
-    ) -> HitRecord {
+    ) -> HitRecord<'a> {
         let tmp = HitRecord {
             p: point,
             normal,
             t,
-            front_face: None,
+            material,
+            front_face: false,
         };
 
         tmp.calculate_face_normal(r, outward_normal)
     }
 
-    fn calculate_face_normal(self, r: &Ray, outward_normal: &Vec3) -> HitRecord {
+    fn calculate_face_normal(self, r: &Ray, outward_normal: &Vec3) -> HitRecord<'a> {
         let front_face = dot(r.direction, *outward_normal) < 0.0;
         HitRecord {
-            front_face: Some(front_face),
+            front_face,
             normal: if front_face {
                 outward_normal.clone()
             } else {

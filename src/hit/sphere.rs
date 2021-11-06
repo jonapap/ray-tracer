@@ -1,21 +1,27 @@
 use crate::base::Vec3;
 use crate::hit::hit_record::HitRecord;
 use crate::hit::Hittable;
+use crate::materials::Material;
 use crate::ray::Ray;
 use cgmath::{dot, InnerSpace};
 
-pub struct Sphere {
+pub struct Sphere<M: Material> {
     center: Vec3,
     radius: f64,
+    material: M,
 }
 
-impl Sphere {
-    pub fn new(center: Vec3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+impl<M: Material> Sphere<M> {
+    pub fn new(center: Vec3, radius: f64, material: M) -> Sphere<M> {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
-impl Hittable for Sphere {
+impl<M: Material> Hittable for Sphere<M> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.direction.magnitude2();
@@ -37,10 +43,11 @@ impl Hittable for Sphere {
             }
         }
 
-        Some(HitRecord::new_with_face_normal(
+        Some(HitRecord::new(
             root,
             r.at(root),
             (r.at(root) - self.center) / self.radius,
+            &self.material,
             &r,
             &((r.at(root) - self.center) / self.radius),
         ))
