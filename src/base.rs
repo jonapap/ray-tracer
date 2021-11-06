@@ -10,6 +10,8 @@ use std::ops::Range;
 use std::path::Path;
 
 thread_local! {
+    // Share the random number generator in a thread for performance reasons and prevent issues
+    // where the same vector will be returned
     pub static RNG: RefCell<SmallRng> = RefCell::new(SmallRng::seed_from_u64(123123));
 }
 

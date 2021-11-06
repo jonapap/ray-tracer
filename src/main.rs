@@ -10,7 +10,8 @@ use crate::hit::*;
 use crate::ray::Ray;
 use indicatif::{ParallelProgressIterator, ProgressBar};
 use itertools::Itertools;
-use rand::Rng;
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
@@ -63,7 +64,7 @@ fn main() {
         .into_par_iter()
         .progress_with(bar)
         .map(|(j, i)| {
-            let mut rng = rand::thread_rng();
+            let mut rng = SmallRng::from_rng(rand::thread_rng()).unwrap();
 
             (0..samples_per_pixel)
                 // .into_iter()
