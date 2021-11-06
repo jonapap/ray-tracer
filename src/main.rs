@@ -52,19 +52,16 @@ fn main() {
 
     let cam = Camera::new();
 
-    println!("P3");
-    println!("{} {}", image_width, image_height);
-    println!("255");
-
     let bar = ProgressBar::new((image_height * image_width) as u64);
     bar.set_style(indicatif::ProgressStyle::default_bar().progress_chars("=> "));
+    bar.set_draw_delta((image_height * image_width / 1000) as u64);
 
     let pixels: Vec<Color> = (0..(image_height - 1))
         .rev()
         .cartesian_product(0..image_width)
         .collect::<Vec<_>>()
         .into_par_iter()
-        // .progress_with(bar)
+        .progress_with(bar)
         .map(|(j, i)| {
             let mut rng = rand::thread_rng();
 
@@ -81,9 +78,12 @@ fn main() {
         })
         .collect();
 
-    for i in pixels {
-        write_color(i, samples_per_pixel);
-    }
+    write_color(
+        &pixels,
+        samples_per_pixel,
+        image_width as u32,
+        (image_height - 1) as u32,
+    );
 
-    eprintln!("Done!");
+    println!("Done!");
 }
