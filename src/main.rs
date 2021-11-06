@@ -21,7 +21,8 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
 
     match world.hit(r, 0.001, f64::INFINITY) {
         Some(rec) => {
-            let target = rec.p + rec.normal + random_unit_vector();
+            // let target = rec.p + rec.normal + random_unit_vector();
+            let target = rec.p + random_in_hemisphere(&rec.normal);
 
             0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
         }

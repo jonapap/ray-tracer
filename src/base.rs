@@ -1,5 +1,5 @@
 use cgmath::num_traits::clamp;
-use cgmath::{InnerSpace, Vector3};
+use cgmath::{dot, InnerSpace, Vector3};
 use png::*;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
@@ -84,4 +84,14 @@ pub fn random_in_unit_sphere() -> Vec3 {
 
 pub fn random_unit_vector() -> Vec3 {
     return unit_vector(&random_in_unit_sphere());
+}
+
+pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
+    let in_unit_sphere = random_in_unit_sphere();
+    if dot(in_unit_sphere, *normal) > 0.0 {
+        // In the same hemisphere as the normal
+        in_unit_sphere
+    } else {
+        -in_unit_sphere
+    }
 }
