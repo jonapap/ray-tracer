@@ -3,15 +3,12 @@ mod camera;
 mod hit;
 mod materials;
 mod ray;
+mod worlds;
 
 use crate::base::*;
-use crate::camera::Camera;
-use crate::hit::sphere::Sphere;
 use crate::hit::*;
-use crate::materials::dielectric::Dielectric;
-use crate::materials::lambertian::Lambertian;
-use crate::materials::metal::Metal;
 use crate::ray::Ray;
+use crate::worlds::random_scene1;
 use indicatif::{ParallelProgressIterator, ProgressBar};
 use itertools::Itertools;
 use rand::rngs::SmallRng;
@@ -46,45 +43,7 @@ fn main() {
     let samples_per_pixel = 100;
     let max_depth = 50;
 
-    // World
-
-    let mut world = HittableList::new();
-
-    let material_ground = Lambertian::new(Color::new(0.8, 0.8, 0.0));
-    let material_center = Dielectric::new(1.5);
-    let material_left = Dielectric::new(1.5);
-    let material_right = Metal::new(Color::new(0.8, 0.6, 0.2), 1.0);
-
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        material_ground,
-    )));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        material_center,
-    )));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        0.5,
-        material_left,
-    )));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        material_right,
-    )));
-
-    // Camera
-
-    let cam = Camera::new(
-        &Vec3::new(-2.0, 2.0, 1.0),
-        &Vec3::new(0.0, 0.0, -1.0),
-        &Vec3::new(0.0, 1.0, 0.0),
-        90.0,
-        aspect_ratio,
-    );
+    let (cam, world) = random_scene1(aspect_ratio);
 
     let bar = ProgressBar::new((image_height * image_width) as u64);
     bar.set_style(indicatif::ProgressStyle::default_bar().progress_chars("=> "));

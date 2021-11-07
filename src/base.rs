@@ -4,7 +4,6 @@ use png::*;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use std::cell::RefCell;
-use std::cmp::min;
 use std::fs::File;
 use std::io::BufWriter;
 use std::ops::Range;
@@ -53,7 +52,7 @@ pub fn write_color(pixels_color: &Vec<Color>, samples_per_pixel: u32, width: u32
     writer.write_image_data(&pixels[..]).unwrap();
 }
 
-fn random_vector() -> Vec3 {
+pub fn random_vector() -> Vec3 {
     RNG.with(|rng| {
         let mut rng = rng.borrow_mut();
 
@@ -61,7 +60,7 @@ fn random_vector() -> Vec3 {
     })
 }
 
-fn random_vector_range(r: Range<f64>) -> Vec3 {
+pub fn random_vector_range(r: Range<f64>) -> Vec3 {
     RNG.with(|rng| {
         let mut rng = rng.borrow_mut();
         Vec3::new(
@@ -124,5 +123,30 @@ pub fn random_double() -> f64 {
         let mut rng = rng.borrow_mut();
 
         rng.gen()
+    })
+}
+pub fn random_double_range(a: Range<f64>) -> f64 {
+    RNG.with(|rng| {
+        let mut rng = rng.borrow_mut();
+
+        rng.gen_range(a)
+    })
+}
+
+pub fn random_in_unit_disk() -> Vec3 {
+    RNG.with(|rng| {
+        let mut rng = rng.borrow_mut();
+
+        loop {
+            let p = Vec3::new(
+                rng.gen_range(-1.0..1.0),
+                rng.gen_range(-1.0..1.0),
+                rng.gen_range(-1.0..1.0),
+            );
+            if p.magnitude2() >= 1.0 {
+                continue;
+            }
+            return p;
+        }
     })
 }
