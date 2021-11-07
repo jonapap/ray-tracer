@@ -41,7 +41,7 @@ fn main() {
     // Image
 
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 400 * 5;
+    let image_width = 400;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
     let samples_per_pixel = 100;
     let max_depth = 50;
@@ -78,7 +78,13 @@ fn main() {
 
     // Camera
 
-    let cam = Camera::new();
+    let cam = Camera::new(
+        &Vec3::new(-2.0, 2.0, 1.0),
+        &Vec3::new(0.0, 0.0, -1.0),
+        &Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        aspect_ratio,
+    );
 
     let bar = ProgressBar::new((image_height * image_width) as u64);
     bar.set_style(indicatif::ProgressStyle::default_bar().progress_chars("=> "));
