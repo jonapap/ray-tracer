@@ -4,6 +4,7 @@ use png::*;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use std::cell::RefCell;
+use std::cmp::min;
 use std::fs::File;
 use std::io::BufWriter;
 use std::ops::Range;
@@ -108,4 +109,20 @@ pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
 
 pub fn multiply_colors(c1: &Color, c2: &Color) -> Color {
     Color::new(c1.x * c2.x, c1.y * c2.y, c1.z * c2.z)
+}
+
+pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+    let cos_theta = f64::min(dot(-(*uv), *n), 1.0);
+    let r_out_prep = etai_over_etat * (uv + cos_theta * n);
+    let r_out_parallel = -(1.0 - r_out_prep.magnitude2()).sqrt() * n;
+
+    r_out_parallel + r_out_prep
+}
+
+pub fn random_double() -> f64 {
+    RNG.with(|rng| {
+        let mut rng = rng.borrow_mut();
+
+        rng.gen()
+    })
 }
