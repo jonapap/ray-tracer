@@ -17,7 +17,7 @@ impl Material for Lambertian {
     fn scatter(&self, _: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let scatter_direction = rec.normal + random_unit_vector();
 
-        if is_near_zero(&scatter_direction) {
+        if scatter_direction.is_near_zero() {
             Some((self.albedo, Ray::new(rec.p, rec.normal)))
         } else {
             Some((self.albedo, Ray::new(rec.p, scatter_direction)))

@@ -2,7 +2,7 @@ use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::materials::Material;
 use crate::ray::Ray;
-use cgmath::dot;
+use cgmath::{dot, InnerSpace};
 
 pub struct Metal {
     albedo: Color,
@@ -20,7 +20,7 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, ray: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
-        let reflected = reflect(&unit_vector(&ray.direction), &rec.normal);
+        let reflected = ray.direction.normalize().reflect(&rec.normal);
 
         let scattered = Ray::new(rec.p, reflected + self.fuzz * random_in_unit_sphere());
 

@@ -2,8 +2,8 @@ use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::materials::Material;
 use crate::ray::Ray;
-use cgmath::dot;
 use cgmath::num_traits::Pow;
+use cgmath::{dot, InnerSpace};
 
 pub struct Dielectric {
     ir: f64,
@@ -23,16 +23,16 @@ impl Material for Dielectric {
             self.ir
         };
 
-        let unit_direction = unit_vector(&ray.direction);
+        let unit_direction = ray.direction.normalize();
         let cos_theta = f64::min(dot(-unit_direction, rec.normal), 1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
         let direction =
             if cannot_refract || reflectance(cos_theta, refraction_ratio) > random_double() {
-                reflect(&unit_direction, &rec.normal)
+                unit_direction.reflect(&rec.normal)
             } else {
-                refract(&unit_direction, &rec.normal, refraction_ratio)
+                unit_direction.refract(&rec.normal, refraction_ratio)
             };
 
         Some((Color::new(1.0, 1.0, 1.0), Ray::new(rec.p, direction)))

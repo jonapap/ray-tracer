@@ -1,5 +1,6 @@
 use crate::base::*;
 use crate::ray::Ray;
+use cgmath::InnerSpace;
 
 pub struct Camera {
     origin: Vec3,
@@ -27,8 +28,8 @@ impl Camera {
         let viewport_height = 2.0 * h;
         let viewport_width = aspect_ratio * viewport_height;
 
-        let w = unit_vector(&(*lookfrom - *lookat));
-        let u = unit_vector(&vup.cross(w));
+        let w = (*lookfrom - *lookat).normalize();
+        let u = (&vup.cross(w)).normalize();
         let v = w.cross(u);
 
         let origin = *lookfrom;

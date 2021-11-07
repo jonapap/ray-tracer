@@ -7,6 +7,7 @@ use rand::{Rng, SeedableRng};
 use std::cell::RefCell;
 use std::fs::File;
 use std::io::BufWriter;
+use std::ops;
 use std::ops::Range;
 use std::path::Path;
 
@@ -22,8 +23,35 @@ pub type Color = Vector3<f64>;
 
 pub type Vec3 = Vector3<f64>;
 
-pub fn unit_vector(vec: &Vec3) -> Vec3 {
-    vec / vec.magnitude()
+pub trait VectorExt {
+    fn is_near_zero(&self) -> bool;
+    fn reflect(&self, n: &Vec3) -> Vec3;
+    fn refract(&self, n: &Vec3, etai_over_etat: f64) -> Vec3;
+    fn multiply_with(&self, other: &Vec3) -> Vec3;
+}
+
+impl VectorExt for Vec3 {
+    fn is_near_zero(&self) -> bool {
+        let s = 1e-8;
+
+        (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
+    }
+
+    fn reflect(&self, n: &Vec3) -> Vec3 {
+        self - 2.0 * dot(*self, *n) * n
+    }
+
+    fn refract(&self, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = f64::min(dot(-(*self), *n), 1.0);
+        let r_out_prep = etai_over_etat * (self + cos_theta * n);
+        let r_out_parallel = -(1.0 - r_out_prep.magnitude2()).sqrt() * n;
+
+        r_out_parallel + r_out_prep
+    }
+
+    fn multiply_with(&self, c2: &Vec3) -> Vec3 {
+        Vec3::new(self.x * c2.x, self.y * c2.y, self.z * c2.z)
+    }
 }
 
 pub fn write_color(pixels_color: &Vec<Color>, samples_per_pixel: u32, width: u32, height: u32) {
@@ -86,7 +114,7 @@ pub fn random_in_unit_sphere() -> Vec3 {
 }
 
 pub fn random_unit_vector() -> Vec3 {
-    return unit_vector(&random_in_unit_sphere());
+    return random_in_unit_sphere().normalize();
 }
 
 pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
@@ -97,28 +125,6 @@ pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
     } else {
         -in_unit_sphere
     }
-}
-
-pub fn is_near_zero(vec: &Vec3) -> bool {
-    let s = 1e-8;
-
-    (vec.x.abs() < s) && (vec.y.abs() < s) && (vec.z.abs() < s)
-}
-
-pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-    v - 2.0 * dot(*v, *n) * n
-}
-
-pub fn multiply_colors(c1: &Color, c2: &Color) -> Color {
-    Color::new(c1.x * c2.x, c1.y * c2.y, c1.z * c2.z)
-}
-
-pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
-    let cos_theta = f64::min(dot(-(*uv), *n), 1.0);
-    let r_out_prep = etai_over_etat * (uv + cos_theta * n);
-    let r_out_parallel = -(1.0 - r_out_prep.magnitude2()).sqrt() * n;
-
-    r_out_parallel + r_out_prep
 }
 
 pub fn random_double() -> f64 {

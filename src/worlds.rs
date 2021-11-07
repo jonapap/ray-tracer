@@ -8,14 +8,16 @@ use crate::materials::metal::Metal;
 use crate::ray::Ray;
 use cgmath::InnerSpace;
 
-pub fn blue_sky(r: &Ray) -> Color {
-    let unit_direction = unit_vector(&r.direction);
+type Scene = (Camera, HittableList, Background);
+
+fn blue_sky(r: &Ray) -> Color {
+    let unit_direction = r.direction.normalize();
     let t = 0.5 * (unit_direction.y + 1.0);
 
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
 
-pub fn random_scene1(aspect_ratio: f64) -> (Camera, HittableList, Background) {
+pub fn random_scene1(aspect_ratio: f64) -> Scene {
     let mut world = HittableList::new();
 
     let ground_material = Lambertian::new(Color::new(0.5, 0.5, 0.5));
@@ -37,7 +39,7 @@ pub fn random_scene1(aspect_ratio: f64) -> (Camera, HittableList, Background) {
             if (center - Vec3::new(4.0, 0.2, 0.0)).magnitude() > 0.9 {
                 if choose_mat < 0.8 {
                     // diffuse
-                    let albedo = multiply_colors(&random_vector(), &random_vector());
+                    let albedo = random_vector().multiply_with(&random_vector());
                     world.add(Box::new(Sphere::new(center, 0.2, Lambertian::new(albedo))));
                 } else if choose_mat < 0.95 {
                     // metal
@@ -92,7 +94,7 @@ pub fn random_scene1(aspect_ratio: f64) -> (Camera, HittableList, Background) {
     return (cam, world, blue_sky);
 }
 
-pub fn simple_scene1(aspect_ratio: f64) -> (Camera, HittableList) {
+pub fn simple_scene1(aspect_ratio: f64) -> Scene {
     // World
 
     let mut world = HittableList::new();
@@ -126,14 +128,14 @@ pub fn simple_scene1(aspect_ratio: f64) -> (Camera, HittableList) {
     // Camera
 
     let cam = Camera::new(
-        &Vec3::new(-2.0, 2.0, 1.0),
+        &Vec3::new(0.0, 0.0, 0.0),
         &Vec3::new(0.0, 0.0, -1.0),
         &Vec3::new(0.0, 1.0, 0.0),
         90.0,
         aspect_ratio,
         0.1,
-        10.0,
+        1.0,
     );
 
-    return (cam, world);
+    return (cam, world, blue_sky);
 }

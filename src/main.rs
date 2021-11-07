@@ -22,10 +22,11 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32, background: Background) 
 
     match world.hit(r, 0.001, f64::INFINITY) {
         Some(rec) => match rec.material.scatter(r, &rec) {
-            Some(scatter) => multiply_colors(
-                &scatter.0,
-                &ray_color(&scatter.1, world, depth - 1, background),
-            ),
+            Some(scatter) => {
+                scatter
+                    .0
+                    .multiply_with(&ray_color(&scatter.1, world, depth - 1, background))
+            }
             None => Color::new(0.0, 0.0, 0.0),
         },
         None => background(r),
