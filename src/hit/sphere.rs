@@ -1,4 +1,4 @@
-use crate::base::Vec3;
+use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::hit::Hittable;
 use crate::materials::Material;
@@ -6,13 +6,13 @@ use crate::ray::Ray;
 use cgmath::{dot, InnerSpace};
 
 pub struct Sphere<M: Material> {
-    center: Vec3,
+    center: Point3,
     radius: f64,
     material: M,
 }
 
 impl<M: Material> Sphere<M> {
-    pub fn new(center: Vec3, radius: f64, material: M) -> Sphere<M> {
+    pub fn new(center: Point3, radius: f64, material: M) -> Sphere<M> {
         Sphere {
             center,
             radius,

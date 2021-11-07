@@ -1,11 +1,11 @@
-use crate::base::Vec3;
+use crate::base::*;
 use crate::materials::Material;
 use crate::ray::Ray;
 use cgmath::dot;
 
 pub struct HitRecord<'a> {
     pub t: f64,
-    pub p: Vec3,
+    pub p: Point3,
     pub normal: Vec3,
     pub material: &'a dyn Material,
     pub front_face: bool,
@@ -14,7 +14,7 @@ pub struct HitRecord<'a> {
 impl<'a> HitRecord<'a> {
     pub fn new(
         t: f64,
-        point: Vec3,
+        point: Point3,
         normal: Vec3,
         material: &'a dyn Material,
         r: &Ray,

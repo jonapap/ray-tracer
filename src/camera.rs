@@ -3,8 +3,8 @@ use crate::ray::Ray;
 use cgmath::InnerSpace;
 
 pub struct Camera {
-    origin: Vec3,
-    lower_left_corner: Vec3,
+    origin: Point3,
+    lower_left_corner: Point3,
     horizontal: Vec3,
     vertical: Vec3,
     u: Vec3,
@@ -15,8 +15,8 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(
-        lookfrom: &Vec3,
-        lookat: &Vec3,
+        lookfrom: &Point3,
+        lookat: &Point3,
         vup: &Vec3,
         vfov: f64,
         aspect_ratio: f64,

@@ -1,15 +1,15 @@
-use cgmath::Vector3;
+use crate::base::*;
 
 pub struct Ray {
-    pub origin: Vector3<f64>,
-    pub direction: Vector3<f64>,
+    pub origin: Point3,
+    pub direction: Point3,
 }
 
 impl Ray {
-    pub(crate) fn new(origin: Vector3<f64>, direction: Vector3<f64>) -> Ray {
+    pub(crate) fn new(origin: Point3, direction: Vec3) -> Ray {
         Ray { origin, direction }
     }
-    pub(crate) fn at(&self, t: f64) -> Vector3<f64> {
+    pub(crate) fn at(&self, t: f64) -> Vec3 {
         self.origin + t * self.direction
     }
 }
