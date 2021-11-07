@@ -5,9 +5,17 @@ use crate::hit::HittableList;
 use crate::materials::dielectric::Dielectric;
 use crate::materials::lambertian::Lambertian;
 use crate::materials::metal::Metal;
+use crate::ray::Ray;
 use cgmath::InnerSpace;
 
-pub fn random_scene1(aspect_ratio: f64) -> (Camera, HittableList) {
+pub fn blue_sky(r: &Ray) -> Color {
+    let unit_direction = unit_vector(&r.direction);
+    let t = 0.5 * (unit_direction.y + 1.0);
+
+    (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+}
+
+pub fn random_scene1(aspect_ratio: f64) -> (Camera, HittableList, Background) {
     let mut world = HittableList::new();
 
     let ground_material = Lambertian::new(Color::new(0.5, 0.5, 0.5));
@@ -81,7 +89,7 @@ pub fn random_scene1(aspect_ratio: f64) -> (Camera, HittableList) {
         dist_to_focus,
     );
 
-    return (cam, world);
+    return (cam, world, blue_sky);
 }
 
 pub fn simple_scene1(aspect_ratio: f64) -> (Camera, HittableList) {

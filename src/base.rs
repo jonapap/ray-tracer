@@ -1,3 +1,4 @@
+use crate::ray::Ray;
 use cgmath::num_traits::clamp;
 use cgmath::{dot, InnerSpace, Vector3};
 use png::*;
@@ -14,6 +15,8 @@ thread_local! {
     // where the same vector will be returned
     pub static RNG: RefCell<SmallRng> = RefCell::new(SmallRng::seed_from_u64(123123));
 }
+
+pub type Background = fn(&Ray) -> Color;
 
 pub type Color = Vector3<f64>;
 

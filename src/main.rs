@@ -15,22 +15,20 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 
-fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
+fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32, background: Background) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
 
     match world.hit(r, 0.001, f64::INFINITY) {
         Some(rec) => match rec.material.scatter(r, &rec) {
-            Some(scatter) => multiply_colors(&scatter.0, &ray_color(&scatter.1, world, depth - 1)),
+            Some(scatter) => multiply_colors(
+                &scatter.0,
+                &ray_color(&scatter.1, world, depth - 1, background),
+            ),
             None => Color::new(0.0, 0.0, 0.0),
         },
-        None => {
-            let unit_direction = unit_vector(&r.direction);
-            let t = 0.5 * (unit_direction.y + 1.0);
-
-            (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
-        }
+        None => background(r),
     }
 }
 
@@ -43,7 +41,7 @@ fn main() {
     let samples_per_pixel = 100;
     let max_depth = 50;
 
-    let (cam, world) = random_scene1(aspect_ratio);
+    let (cam, world, background) = random_scene1(aspect_ratio);
 
     let bar = ProgressBar::new((image_height * image_width) as u64);
     bar.set_style(indicatif::ProgressStyle::default_bar().progress_chars("=> "));
@@ -65,7 +63,7 @@ fn main() {
                     let v = ((j as f64) + rng.gen::<f64>()) / (image_height - 1) as f64;
 
                     let r = cam.get_ray(u, v);
-                    ray_color(&r, &world, max_depth)
+                    ray_color(&r, &world, max_depth, background)
                 })
                 .sum()
         })
