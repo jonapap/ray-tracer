@@ -15,6 +15,7 @@ use itertools::Itertools;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
+use std::time::Instant;
 
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32, background: Background) -> Color {
     if depth <= 0 {
@@ -50,7 +51,7 @@ fn main() {
 
     // Image
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 400;
+    let image_width = 400 * 10;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
     let samples_per_pixel = 100;
     let max_depth = 50;
@@ -58,9 +59,15 @@ fn main() {
     let (cam, world, background) = random_scene1(aspect_ratio);
 
     let bar = ProgressBar::new((image_height * image_width) as u64);
-    bar.set_style(indicatif::ProgressStyle::default_bar().progress_chars("=> "));
+    bar.set_style(
+        indicatif::ProgressStyle::default_bar()
+            .template("[{elapsed}] {bar:40.cyan/blue} {pos:>7}/{len:7} eta:{eta}")
+            .progress_chars("=> "),
+    );
     bar.set_draw_delta((image_height * image_width / 1000) as u64);
 
+    println!("Starting to render...");
+    let start = Instant::now();
     let pixels: Vec<Color> = (0..(image_height - 1))
         .rev()
         .cartesian_product(0..image_width)
@@ -91,5 +98,5 @@ fn main() {
         matches.value_of("output").unwrap(),
     );
 
-    println!("Done!");
+    println!("Done! Rendered in {:?}", start.elapsed());
 }
