@@ -9,6 +9,7 @@ use crate::base::*;
 use crate::hit::*;
 use crate::ray::Ray;
 use crate::worlds::random_scene1;
+use clap::{App, Arg};
 use indicatif::{ParallelProgressIterator, ProgressBar};
 use itertools::Itertools;
 use rand::rngs::SmallRng;
@@ -34,8 +35,20 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32, background: Background) 
 }
 
 fn main() {
-    // Image
+    let matches = App::new("Ray-Tracer Engine")
+        .version("1.0")
+        .author("Jonathan Papineau <hello@jontech.app>")
+        .arg(
+            Arg::with_name("output")
+                .short("o")
+                .long("output")
+                .help("Output file")
+                .takes_value(true)
+                .default_value("out.png"),
+        )
+        .get_matches();
 
+    // Image
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
@@ -75,6 +88,7 @@ fn main() {
         samples_per_pixel,
         image_width as u32,
         (image_height - 1) as u32,
+        matches.value_of("output").unwrap(),
     );
 
     println!("Done!");

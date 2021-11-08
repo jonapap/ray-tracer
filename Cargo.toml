@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 cgmath = "0.18.0"
-derive-new = "0.5.9"
+clap = "2.33.3"
 rand = {version = "0.8.0", features = ["small_rng"]}
 rayon = "1.5"
 itertools = "0.10.1"

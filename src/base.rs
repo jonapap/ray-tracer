@@ -56,7 +56,13 @@ impl VectorExt for Vec3 {
     }
 }
 
-pub fn write_color(pixels_color: &Vec<Color>, samples_per_pixel: u32, width: u32, height: u32) {
+pub fn write_color(
+    pixels_color: &Vec<Color>,
+    samples_per_pixel: u32,
+    width: u32,
+    height: u32,
+    output_name: &str,
+) {
     let scale = 1.0 / samples_per_pixel as f64;
 
     let pixels: Vec<_> = pixels_color
@@ -76,7 +82,7 @@ pub fn write_color(pixels_color: &Vec<Color>, samples_per_pixel: u32, width: u32
         .flatten()
         .collect();
 
-    let file = File::create(Path::new("out.png")).unwrap();
+    let file = File::create(Path::new(output_name)).unwrap();
     let mut encoder = Encoder::new(BufWriter::new(file), width as u32, height as u32);
     encoder.set_color(ColorType::Rgb);
     encoder.set_depth(BitDepth::Eight);
