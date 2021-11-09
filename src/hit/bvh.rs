@@ -42,17 +42,17 @@ impl Hittable for BVHNode {
         }
     }
 
-    fn bounding_box(&self, time0: f64, time1: f64) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<AABB> {
         Some(self.aabb)
     }
 }
 
 impl BVHNode {
-    pub fn new_from_hittable_list(list: HittableList, time0: f64, time1: f64) -> BVHNode {
-        BVHNode::new(list.list, time0, time1)
+    pub fn new_from_hittable_list(list: HittableList) -> BVHNode {
+        BVHNode::new(list.list)
     }
 
-    pub fn new(mut objects: Vec<Box<dyn Hittable>>, time0: f64, time1: f64) -> BVHNode {
+    pub fn new(mut objects: Vec<Box<dyn Hittable>>) -> BVHNode {
         // let main_box = objects
         //     .iter()
         //     .map(|x| x.bounding_box(time0, time1))
@@ -81,20 +81,18 @@ impl BVHNode {
                 let left_objs: Vec<_> = objects.drain(0..mid).collect();
                 let right_objs = objects;
 
-                let left: Box<dyn Hittable> = Box::new(BVHNode::new(left_objs, time0, time1));
-                let right: Box<dyn Hittable> = Box::new(BVHNode::new(right_objs, time0, time1));
+                let left: Box<dyn Hittable> = Box::new(BVHNode::new(left_objs));
+                let right: Box<dyn Hittable> = Box::new(BVHNode::new(right_objs));
                 (Some(left), Some(right))
             }
         };
 
         let aabb = match (&left, &right) {
-            (Some(a), Some(b)) => {
-                match (a.bounding_box(time0, time1), b.bounding_box(time0, time1)) {
-                    (Some(ab), Some(bb)) => AABB::surrounding_box(&ab, &bb),
-                    (_, _) => panic!("No bounding box in BVNNode constructor!"),
-                }
-            }
-            (Some(a), None) => match a.bounding_box(time0, time1) {
+            (Some(a), Some(b)) => match (a.bounding_box(), b.bounding_box()) {
+                (Some(ab), Some(bb)) => AABB::surrounding_box(&ab, &bb),
+                (_, _) => panic!("No bounding box in BVNNode constructor!"),
+            },
+            (Some(a), None) => match a.bounding_box() {
                 Some(ab) => ab,
                 _ => panic!("No bounding box in BVNNode constructor!"),
             },
@@ -106,8 +104,8 @@ impl BVHNode {
 }
 
 fn get_boxes(left: &Box<dyn Hittable>, right: &Box<dyn Hittable>) -> (AABB, AABB) {
-    let l_box = left.bounding_box(0.0, 0.0);
-    let r_box = right.bounding_box(0.0, 0.0);
+    let l_box = left.bounding_box();
+    let r_box = right.bounding_box();
 
     let l_box = match l_box {
         Some(bounds) => bounds,

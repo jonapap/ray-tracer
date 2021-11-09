@@ -54,7 +54,7 @@ impl<M: Material> Hittable for Sphere<M> {
         ))
     }
 
-    fn bounding_box(&self, time0: f64, time1: f64) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<AABB> {
         Some(AABB::new(
             self.center - Vec3::new(self.radius, self.radius, self.radius),
             self.center + Vec3::new(self.radius, self.radius, self.radius),
