@@ -53,9 +53,9 @@ fn main() {
 
     // Image
     let aspect_ratio = 3.0 / 2.0;
-    let image_width = 1200;
+    let image_width = 400;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 100;
     let max_depth = 50;
 
     let (cam, world, background) = random_scene1(aspect_ratio);

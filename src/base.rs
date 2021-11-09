@@ -177,9 +177,9 @@ pub fn random_in_unit_disk() -> Vec3 {
                 rng.gen_range(-1.0..1.0),
                 rng.gen_range(-1.0..1.0),
             );
-            // if p.magnitude2() >= 1.0 {
-            //     continue;
-            // }
+            if p.magnitude2() >= 1.0 {
+                continue;
+            }
             return p;
         }
     })

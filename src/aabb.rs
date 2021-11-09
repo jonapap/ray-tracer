@@ -22,16 +22,14 @@ impl AABB {
 
     pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
         for a in 0..3 {
-            let t0 = f64::min(
-                (self.minimum[a] - r.origin[a]) / r.direction[a],
-                (self.maximum[a] - r.origin[a]) / r.direction[a],
-            );
-            let t1 = f64::max(
-                (self.minimum[a] - r.origin[a]) / r.direction[a],
-                (self.maximum[a] - r.origin[a]) / r.direction[a],
-            );
-            let t_min = f64::max(t0, t_min);
-            let t_max = f64::min(t1, t_max);
+            let inv_d = 1.0 / r.direction[a];
+            let t0 = (self.min()[a] - r.origin[a]) * inv_d;
+            let t1 = (self.max()[a] - r.origin[a]) * inv_d;
+            let (t0, t1) = if inv_d < 0.0 { (t1, t0) } else { (t0, t1) };
+
+            let t_min = if t0 > t_min { t0 } else { t_min };
+            let t_max = if t1 < t_max { t1 } else { t_max };
+
             if t_max <= t_min {
                 return false;
             }
