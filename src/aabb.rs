@@ -1,6 +1,7 @@
 use crate::base::*;
 use crate::ray::Ray;
 
+#[derive(Copy, Clone)]
 pub struct AABB {
     minimum: Point3,
     maximum: Point3,
@@ -46,9 +47,9 @@ impl AABB {
         );
 
         let big = Point3::new(
-            f64::min(box0.max().x, box1.max().x),
-            f64::min(box0.max().y, box1.max().y),
-            f64::min(box0.max().z, box1.max().z),
+            f64::max(box0.max().x, box1.max().x),
+            f64::max(box0.max().y, box1.max().y),
+            f64::max(box0.max().z, box1.max().z),
         );
 
         AABB::new(small, big)
