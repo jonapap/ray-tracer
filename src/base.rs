@@ -30,6 +30,7 @@ pub trait VectorExt {
     fn reflect(&self, n: &Vec3) -> Vec3;
     fn refract(&self, n: &Vec3, etai_over_etat: f64) -> Vec3;
     fn multiply_with(&self, other: &Vec3) -> Vec3;
+    fn get_axis(&self, axis: u32) -> f64;
 }
 
 impl VectorExt for Vec3 {
@@ -53,6 +54,14 @@ impl VectorExt for Vec3 {
 
     fn multiply_with(&self, c2: &Vec3) -> Vec3 {
         Vec3::new(self.x * c2.x, self.y * c2.y, self.z * c2.z)
+    }
+
+    fn get_axis(&self, axis: u32) -> f64 {
+        match axis {
+            0 => self.x,
+            1 => self.y,
+            _ => self.z,
+        }
     }
 }
 
@@ -135,6 +144,14 @@ pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
     }
 }
 
+pub fn random_int(a: Range<i32>) -> i32 {
+    RNG.with(|rng| {
+        let mut rng = rng.borrow_mut();
+
+        rng.gen_range(a)
+    })
+}
+
 pub fn random_double() -> f64 {
     RNG.with(|rng| {
         let mut rng = rng.borrow_mut();
@@ -160,9 +177,9 @@ pub fn random_in_unit_disk() -> Vec3 {
                 rng.gen_range(-1.0..1.0),
                 rng.gen_range(-1.0..1.0),
             );
-            if p.magnitude2() >= 1.0 {
-                continue;
-            }
+            // if p.magnitude2() >= 1.0 {
+            //     continue;
+            // }
             return p;
         }
     })

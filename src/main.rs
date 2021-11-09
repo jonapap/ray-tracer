@@ -7,6 +7,7 @@ mod ray;
 mod worlds;
 
 use crate::base::*;
+use crate::bvh::BVHNode;
 use crate::hit::*;
 use crate::ray::Ray;
 use crate::worlds::random_scene1;
@@ -52,7 +53,7 @@ fn main() {
 
     // Image
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 400 * 10;
+    let image_width = 400;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
     let samples_per_pixel = 100;
     let max_depth = 50;
@@ -67,14 +68,19 @@ fn main() {
     );
     bar.set_draw_delta((image_height * image_width / 1000) as u64);
 
+    println!("Starting to build BVH tree...");
+    let world = BVHNode::new_from_hittable_list(world, 0.0, 0.0);
+    println!("Done building the tree");
+
     println!("Starting to render...");
     let start = Instant::now();
     let pixels: Vec<Color> = (0..(image_height - 1))
         .rev()
         .cartesian_product(0..image_width)
         .collect::<Vec<_>>()
-        .into_par_iter()
-        .progress_with(bar)
+        // .into_par_iter()
+        // .progress_with(bar)
+        .into_iter()
         .map(|(j, i)| {
             let mut rng = SmallRng::from_rng(rand::thread_rng()).unwrap();
 
