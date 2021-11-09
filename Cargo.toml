@@ -14,3 +14,4 @@ rayon = "1.5"
 itertools = "0.10.1"
 indicatif = {version = "0.16.0", features = ["rayon"]}
 png = "0.17"
+derive-new = "0.5.9"

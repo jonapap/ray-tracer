@@ -1,6 +1,6 @@
+pub mod dielectric;
 pub mod lambertian;
 pub mod metal;
-pub mod dielectric;
 
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;

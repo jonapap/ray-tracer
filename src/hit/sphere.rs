@@ -1,3 +1,4 @@
+use crate::aabb::AABB;
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::hit::Hittable;
@@ -50,6 +51,13 @@ impl<M: Material> Hittable for Sphere<M> {
             &self.material,
             &r,
             &((r.at(root) - self.center) / self.radius),
+        ))
+    }
+
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<AABB> {
+        Some(AABB::new(
+            self.center - Vec3::new(self.radius, self.radius, self.radius),
+            self.center + Vec3::new(self.radius, self.radius, self.radius),
         ))
     }
 }

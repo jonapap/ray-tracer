@@ -1,13 +1,17 @@
 pub mod hit_record;
 pub mod sphere;
 
+use crate::aabb::AABB;
+use crate::base::Point3;
 use crate::hit::hit_record::HitRecord;
 use crate::ray::Ray;
+use itertools::Itertools;
 
 // Hittable
 
 pub trait Hittable: Sync {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<AABB>;
 }
 
 // HittableList
@@ -42,5 +46,20 @@ impl Hittable for HittableList {
         }
 
         return rec;
+    }
+
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<AABB> {
+        if self.list.is_empty() {
+            return None;
+        }
+
+        self.list
+            .iter()
+            .map(|x| x.bounding_box(time0, time1))
+            .reduce(|a, b| match (a, b) {
+                (Some(box0), Some(box1)) => Some(AABB::surrounding_box(&box0, &box1)),
+                (_, _) => None,
+            })
+            .unwrap_or(None)
     }
 }
