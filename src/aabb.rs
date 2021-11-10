@@ -52,4 +52,26 @@ impl AABB {
 
         AABB::new(small, big)
     }
+
+    pub fn area(&self) -> f64 {
+        let dx = self.maximum.x - self.minimum.x;
+        let dy = self.maximum.y - self.minimum.y;
+        let dz = self.maximum.z - self.minimum.z;
+
+        2.0 * (dx * dy + dx * dz + dy * dz)
+    }
+
+    pub fn longest_axis(&self) -> Axis {
+        let dx = (self.maximum.x - self.minimum.x).abs();
+        let dy = (self.maximum.y - self.minimum.y).abs();
+        let dz = (self.maximum.z - self.minimum.z).abs();
+
+        if dx > dy && dx > dz {
+            Axis::X
+        } else if dy > dz {
+            Axis::Y
+        } else {
+            Axis::Z
+        }
+    }
 }

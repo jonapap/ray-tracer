@@ -25,6 +25,12 @@ pub type Vec3 = Vector3<f64>;
 
 pub type Point3 = Vec3;
 
+pub enum Axis {
+    X,
+    Y,
+    Z,
+}
+
 pub trait VectorExt {
     fn is_near_zero(&self) -> bool;
     fn reflect(&self, n: &Vec3) -> Vec3;
