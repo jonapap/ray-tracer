@@ -1,6 +1,7 @@
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::materials::Material;
+use crate::random::RNG;
 use crate::ray::Ray;
 use cgmath::num_traits::Pow;
 use cgmath::{dot, InnerSpace};
@@ -16,7 +17,7 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, ray: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+    fn scatter(&self, ray: &Ray, rec: &HitRecord, rng: &mut RNG) -> Option<(Color, Ray)> {
         let refraction_ratio = if rec.front_face {
             1.0 / self.ir
         } else {
@@ -29,7 +30,7 @@ impl Material for Dielectric {
 
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
         let direction =
-            if cannot_refract || reflectance(cos_theta, refraction_ratio) > random_double() {
+            if cannot_refract || reflectance(cos_theta, refraction_ratio) > rng.random_double() {
                 unit_direction.reflect(&rec.normal)
             } else {
                 unit_direction.refract(&rec.normal, refraction_ratio)

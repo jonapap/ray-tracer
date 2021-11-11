@@ -5,6 +5,7 @@ use crate::hit::HittableList;
 use crate::materials::dielectric::Dielectric;
 use crate::materials::lambertian::Lambertian;
 use crate::materials::metal::Metal;
+use crate::random::RNG;
 use crate::ray::Ray;
 use cgmath::InnerSpace;
 
@@ -27,24 +28,26 @@ pub fn random_scene1(aspect_ratio: f64) -> Scene {
         ground_material,
     )));
 
+    let mut rng = RNG::new();
+
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat = random_double();
+            let choose_mat = rng.random_double();
             let center = Vec3::new(
-                (a as f64) + 0.9 * random_double(),
+                (a as f64) + 0.9 * rng.random_double(),
                 0.2,
-                (b as f64) + 0.9 * random_double(),
+                (b as f64) + 0.9 * rng.random_double(),
             );
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).magnitude() > 0.9 {
                 if choose_mat < 0.8 {
                     // diffuse
-                    let albedo = random_vector().multiply_with(&random_vector());
+                    let albedo = rng.random_vector().multiply_with(&rng.random_vector());
                     world.add(Box::new(Sphere::new(center, 0.2, Lambertian::new(albedo))));
                 } else if choose_mat < 0.95 {
                     // metal
-                    let albedo = random_vector_range(0.5..1.0);
-                    let fuzz = random_double_range(0.0..0.5);
+                    let albedo = rng.random_vector_range(0.5..1.0);
+                    let fuzz = rng.random_double_range(0.0..0.5);
                     world.add(Box::new(Sphere::new(center, 0.2, Metal::new(albedo, fuzz))));
                 } else {
                     // glass

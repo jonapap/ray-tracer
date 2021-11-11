@@ -1,4 +1,5 @@
 use crate::base::*;
+use crate::random::RNG;
 use crate::ray::Ray;
 use cgmath::InnerSpace;
 
@@ -49,8 +50,8 @@ impl Camera {
         }
     }
 
-    pub fn get_ray(&self, s: f64, t: f64) -> Ray {
-        let rd = self.lens_radius * random_in_unit_disk();
+    pub fn get_ray(&self, s: f64, t: f64, rng: &mut RNG) -> Ray {
+        let rd = self.lens_radius * rng.random_in_unit_disk();
         let offset = self.u * rd.x + self.v * rd.y;
 
         Ray::new(

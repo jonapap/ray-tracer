@@ -2,6 +2,7 @@ use crate::aabb::AABB;
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::hit::{Hittable, HittableList};
+use crate::random::RNG;
 use crate::ray::Ray;
 use itertools::Itertools;
 use std::cmp::Ordering;
@@ -52,9 +53,11 @@ impl BVHNode {
     along that axis, and split the items into two.
      */
     fn build_simple(mut objects: Vec<Box<dyn Hittable>>) -> BVHNode {
+        let mut rng = RNG::new();
+
         let main_box = get_aabb_from_list(&objects);
 
-        let axis = random_int(0..3);
+        let axis = rng.random_int(0..3);
         let comparator = match axis {
             0 => compare_box_by_x_axis,
             1 => compare_box_by_y_axis,

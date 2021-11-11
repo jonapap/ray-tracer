@@ -3,12 +3,14 @@ mod base;
 mod camera;
 mod hit;
 mod materials;
+mod random;
 mod ray;
 mod worlds;
 
 use crate::base::*;
 use crate::bvh::BVHNode;
 use crate::hit::*;
+use crate::random::RNG;
 use crate::ray::Ray;
 use crate::worlds::random_scene1;
 use clap::{App, Arg};
@@ -19,17 +21,23 @@ use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 use std::time::Instant;
 
-fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32, background: Background) -> Color {
+fn ray_color(
+    r: &Ray,
+    world: &dyn Hittable,
+    depth: i32,
+    background: Background,
+    rng: &mut RNG,
+) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
 
     match world.hit(r, 0.001, f64::INFINITY) {
-        Some(rec) => match rec.material.scatter(r, &rec) {
+        Some(rec) => match rec.material.scatter(r, &rec, rng) {
             Some(scatter) => {
                 scatter
                     .0
-                    .multiply_with(&ray_color(&scatter.1, world, depth - 1, background))
+                    .multiply_with(&ray_color(&scatter.1, world, depth - 1, background, rng))
             }
             None => Color::new(0.0, 0.0, 0.0),
         },
@@ -55,7 +63,7 @@ fn main() {
     let aspect_ratio = 3.0 / 2.0;
     let image_width = 400;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
-    let samples_per_pixel = 100;
+    let samples_per_pixel = 50;
     let max_depth = 50;
 
     let (cam, world, background) = random_scene1(aspect_ratio);
@@ -81,16 +89,16 @@ fn main() {
         .into_par_iter()
         .progress_with(bar)
         .map(|(j, i)| {
-            let mut rng = SmallRng::from_rng(rand::thread_rng()).unwrap();
+            let mut rng = RNG::new();
 
             (0..samples_per_pixel)
                 // .into_iter()
                 .map(|_| {
-                    let u = ((i as f64) + rng.gen::<f64>()) / (image_width - 1) as f64;
-                    let v = ((j as f64) + rng.gen::<f64>()) / (image_height - 1) as f64;
+                    let u = ((i as f64) + rng.random_double()) / (image_width - 1) as f64;
+                    let v = ((j as f64) + rng.random_double()) / (image_height - 1) as f64;
 
-                    let r = cam.get_ray(u, v);
-                    ray_color(&r, &world, max_depth, background)
+                    let r = cam.get_ray(u, v, &mut rng);
+                    ray_color(&r, &world, max_depth, background, &mut rng)
                 })
                 .sum()
         })

@@ -11,12 +11,6 @@ use std::ops;
 use std::ops::Range;
 use std::path::Path;
 
-thread_local! {
-    // Share the random number generator in a thread for performance reasons and prevent issues
-    // where the same vector will be returned
-    pub static RNG: RefCell<SmallRng> = RefCell::new(SmallRng::seed_from_u64(123123));
-}
-
 pub type Background = fn(&Ray) -> Color;
 
 pub type Color = Vector3<f64>;
@@ -104,89 +98,4 @@ pub fn write_color(
     let mut writer = encoder.write_header().unwrap();
 
     writer.write_image_data(&pixels[..]).unwrap();
-}
-
-pub fn random_vector() -> Vec3 {
-    RNG.with(|rng| {
-        let mut rng = rng.borrow_mut();
-
-        Vec3::new(rng.gen(), rng.gen(), rng.gen())
-    })
-}
-
-pub fn random_vector_range(r: Range<f64>) -> Vec3 {
-    RNG.with(|rng| {
-        let mut rng = rng.borrow_mut();
-        Vec3::new(
-            rng.gen_range(r.clone()),
-            rng.gen_range(r.clone()),
-            rng.gen_range(r.clone()),
-        )
-    })
-}
-
-pub fn random_in_unit_sphere() -> Vec3 {
-    loop {
-        let p = random_vector_range(-1.0..1.0);
-        if p.magnitude2() >= 1.0 {
-            continue;
-        }
-
-        return p;
-    }
-}
-
-pub fn random_unit_vector() -> Vec3 {
-    return random_in_unit_sphere().normalize();
-}
-
-pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
-    let in_unit_sphere = random_in_unit_sphere();
-    if dot(in_unit_sphere, *normal) > 0.0 {
-        // In the same hemisphere as the normal
-        in_unit_sphere
-    } else {
-        -in_unit_sphere
-    }
-}
-
-pub fn random_int(a: Range<i32>) -> i32 {
-    RNG.with(|rng| {
-        let mut rng = rng.borrow_mut();
-
-        rng.gen_range(a)
-    })
-}
-
-pub fn random_double() -> f64 {
-    RNG.with(|rng| {
-        let mut rng = rng.borrow_mut();
-
-        rng.gen()
-    })
-}
-pub fn random_double_range(a: Range<f64>) -> f64 {
-    RNG.with(|rng| {
-        let mut rng = rng.borrow_mut();
-
-        rng.gen_range(a)
-    })
-}
-
-pub fn random_in_unit_disk() -> Vec3 {
-    RNG.with(|rng| {
-        let mut rng = rng.borrow_mut();
-
-        loop {
-            let p = Vec3::new(
-                rng.gen_range(-1.0..1.0),
-                rng.gen_range(-1.0..1.0),
-                rng.gen_range(-1.0..1.0),
-            );
-            if p.magnitude2() >= 1.0 {
-                continue;
-            }
-            return p;
-        }
-    })
 }

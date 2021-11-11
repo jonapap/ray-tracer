@@ -1,6 +1,7 @@
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::materials::Material;
+use crate::random::RNG;
 use crate::ray::Ray;
 use cgmath::{dot, InnerSpace};
 
@@ -19,10 +20,10 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+    fn scatter(&self, ray: &Ray, rec: &HitRecord, rng: &mut RNG) -> Option<(Color, Ray)> {
         let reflected = ray.direction.normalize().reflect(&rec.normal);
 
-        let scattered = Ray::new(rec.p, reflected + self.fuzz * random_in_unit_sphere());
+        let scattered = Ray::new(rec.p, reflected + self.fuzz * rng.random_in_unit_sphere());
 
         if dot(scattered.direction, rec.normal) > 0.0 {
             Some((self.albedo, scattered))
