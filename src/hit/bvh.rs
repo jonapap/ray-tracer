@@ -9,7 +9,7 @@ use std::cmp::Ordering;
 use std::error::Error;
 
 pub struct BVHNode {
-    left: Option<Box<dyn Hittable>>,
+    left: Box<dyn Hittable>,
     right: Option<Box<dyn Hittable>>,
     aabb: AABB,
 }
@@ -20,10 +20,7 @@ impl Hittable for BVHNode {
             return None;
         }
 
-        let hit_left = match &self.left {
-            Some(a) => a.hit(r, t_min, t_max),
-            None => None,
-        };
+        let hit_left = self.left.hit(r, t_min, t_max);
 
         let hit_right = match (&hit_left, &self.right) {
             (Some(a), Some(right)) => right.hit(r, t_min, a.t),
@@ -67,8 +64,8 @@ impl BVHNode {
         objects.sort_by(|a, b| comparator(a, b));
 
         let (left, right) = match objects.len() {
-            1 => (Some(objects.remove(0)), None),
-            2 => (Some(objects.remove(0)), Some(objects.remove(0))),
+            1 => (objects.remove(0), None),
+            2 => (objects.remove(0), Some(objects.remove(0))),
             _ => {
                 let mid = objects.len() / 2;
 
@@ -77,7 +74,7 @@ impl BVHNode {
 
                 let left: Box<dyn Hittable> = Box::new(BVHNode::build_simple(left_objs));
                 let right: Box<dyn Hittable> = Box::new(BVHNode::build_simple(right_objs));
-                (Some(left), Some(right))
+                (left, Some(right))
             }
         };
 
@@ -106,8 +103,8 @@ impl BVHNode {
         objects.sort_by(|a, b| comparator(a, b));
 
         let (left, right) = match objects.len() {
-            1 => (Some(objects.remove(0)), None),
-            2 => (Some(objects.remove(0)), Some(objects.remove(0))),
+            1 => (objects.remove(0), None),
+            2 => (objects.remove(0), Some(objects.remove(0))),
             _ => {
                 let main_box_area = main_box.area();
 
@@ -132,7 +129,7 @@ impl BVHNode {
 
                 let left: Box<dyn Hittable> = Box::new(BVHNode::build_using_sah(left_objs));
                 let right: Box<dyn Hittable> = Box::new(BVHNode::build_using_sah(right_objs));
-                (Some(left), Some(right))
+                (left, Some(right))
             }
         };
 
