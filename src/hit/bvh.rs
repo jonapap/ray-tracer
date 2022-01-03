@@ -8,36 +8,105 @@ use itertools::Itertools;
 use std::cmp::Ordering;
 use std::error::Error;
 
-pub struct BVHNode {
-    left: Box<dyn Hittable>,
-    right: Option<Box<dyn Hittable>>,
-    aabb: AABB,
+enum LinearBVHNodeChild {
+    RightTree(usize),
+    Element(Box<dyn Hittable>),
 }
 
-impl Hittable for BVHNode {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        if !self.aabb.hit(r, t_min, t_max) {
+struct LinearBVHNode {
+    bounds: AABB,
+    child: LinearBVHNodeChild,
+}
+
+pub struct LinearBVHTree {
+    list: Vec<LinearBVHNode>,
+}
+
+impl LinearBVHTree {
+    pub fn new_from_bvhnode(node: BVHNode) -> LinearBVHTree {
+        let mut list = LinearBVHTree { list: Vec::new() };
+
+        let mut offset = 0;
+        list.flatten_bvhtree(node, &mut offset);
+
+        list
+    }
+
+    fn flatten_bvhtree(&mut self, node: BVHNode, offset: &mut usize) -> usize {
+        let myoffset = *offset;
+
+        *offset += 1;
+
+        let node = match node.child {
+            BVHNodeChild::Trees(left, right) => {
+                self.list.push(LinearBVHNode {
+                    bounds: node.bounds,
+                    child: LinearBVHNodeChild::RightTree(0),
+                });
+                self.flatten_bvhtree(*left, offset);
+
+                let right_index = self.flatten_bvhtree(*right, offset);
+
+                self.list.get_mut(myoffset).unwrap().child =
+                    LinearBVHNodeChild::RightTree(right_index);
+            }
+            BVHNodeChild::Element(a) => self.list.push(LinearBVHNode {
+                bounds: node.bounds,
+                child: LinearBVHNodeChild::Element(a),
+            }),
+        };
+
+        return myoffset;
+    }
+
+    fn hit_aux(&self, r: &Ray, t_min: f64, t_max: f64, index: usize) -> Option<HitRecord> {
+        let node = self.list.get(index).unwrap();
+
+        if !node.bounds.hit(r, t_min, t_max) {
             return None;
         }
 
-        let hit_left = self.left.hit(r, t_min, t_max);
+        match &node.child {
+            LinearBVHNodeChild::Element(a) => a.hit(r, t_min, t_max),
+            LinearBVHNodeChild::RightTree(right) => {
+                let left = index + 1;
 
-        let hit_right = match (&hit_left, &self.right) {
-            (Some(a), Some(right)) => right.hit(r, t_min, a.t),
-            (None, Some(right)) => right.hit(r, t_min, t_max),
-            _ => None,
-        };
+                let hit_left = self.hit_aux(r, t_min, t_max, left);
 
-        match (hit_left, hit_right) {
-            (_, Some(r)) => Some(r),
-            (Some(l), _) => Some(l),
-            (_, _) => None,
+                let hit_right = match &hit_left {
+                    Some(a) => self.hit_aux(r, t_min, a.t, *right),
+                    _ => self.hit_aux(r, t_min, t_max, *right),
+                };
+
+                match (hit_left, hit_right) {
+                    (_, Some(r)) => Some(r),
+                    (Some(l), _) => Some(l),
+                    (_, _) => None,
+                }
+            }
         }
+    }
+}
+
+impl Hittable for LinearBVHTree {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        self.hit_aux(r, t_min, t_max, 0)
     }
 
     fn bounding_box(&self) -> Option<AABB> {
-        Some(self.aabb)
+        Some(self.list.get(0).unwrap().bounds)
     }
+}
+
+enum BVHNodeChild {
+    Trees(Box<BVHNode>, Box<BVHNode>),
+    Element(Box<dyn Hittable>),
+    // Element2(Box<dyn Hittable>, Box<dyn Hittable>),
+}
+
+pub struct BVHNode {
+    child: BVHNodeChild,
+    bounds: AABB,
 }
 
 impl BVHNode {
@@ -49,41 +118,41 @@ impl BVHNode {
     Build the BVH tree using a simple algorithm. We recursively decide a random axis, sort the items
     along that axis, and split the items into two.
      */
-    fn build_simple(mut objects: Vec<Box<dyn Hittable>>) -> BVHNode {
-        let mut rng = RNG::new();
-
-        let main_box = get_aabb_from_list(&objects);
-
-        let axis = rng.random_int(0..3);
-        let comparator = match axis {
-            0 => compare_box_by_x_axis,
-            1 => compare_box_by_y_axis,
-            _ => compare_box_by_z_axis,
-        };
-
-        objects.sort_by(|a, b| comparator(a, b));
-
-        let (left, right) = match objects.len() {
-            1 => (objects.remove(0), None),
-            2 => (objects.remove(0), Some(objects.remove(0))),
-            _ => {
-                let mid = objects.len() / 2;
-
-                let left_objs: Vec<_> = objects.drain(0..mid).collect();
-                let right_objs = objects;
-
-                let left: Box<dyn Hittable> = Box::new(BVHNode::build_simple(left_objs));
-                let right: Box<dyn Hittable> = Box::new(BVHNode::build_simple(right_objs));
-                (left, Some(right))
-            }
-        };
-
-        BVHNode {
-            left,
-            right,
-            aabb: main_box,
-        }
-    }
+    // fn build_simple(mut objects: Vec<Box<dyn Hittable>>) -> BVHNode {
+    //     let mut rng = RNG::new();
+    //
+    //     let main_box = get_aabb_from_list(&objects);
+    //
+    //     let axis = rng.random_int(0..3);
+    //     let comparator = match axis {
+    //         0 => compare_box_by_x_axis,
+    //         1 => compare_box_by_y_axis,
+    //         _ => compare_box_by_z_axis,
+    //     };
+    //
+    //     objects.sort_by(|a, b| comparator(a, b));
+    //
+    //     let (left, right) = match objects.len() {
+    //         1 => (objects.remove(0), None),
+    //         2 => (objects.remove(0), Some(objects.remove(0))),
+    //         _ => {
+    //             let mid = objects.len() / 2;
+    //
+    //             let left_objs: Vec<_> = objects.drain(0..mid).collect();
+    //             let right_objs = objects;
+    //
+    //             let left: Box<dyn Hittable> = Box::new(BVHNode::build_simple(left_objs));
+    //             let right: Box<dyn Hittable> = Box::new(BVHNode::build_simple(right_objs));
+    //             (left, Some(right))
+    //         }
+    //     };
+    //
+    //     BVHNode {
+    //         left,
+    //         right,
+    //         bounds: main_box,
+    //     }
+    // }
 
     /*
     Build the BVH tree using a SAH (surface-area heuristic). We recursively call this function. Each
@@ -102,9 +171,9 @@ impl BVHNode {
 
         objects.sort_by(|a, b| comparator(a, b));
 
-        let (left, right) = match objects.len() {
-            1 => (objects.remove(0), None),
-            2 => (objects.remove(0), Some(objects.remove(0))),
+        let child = match objects.len() {
+            1 => BVHNodeChild::Element(objects.remove(0)),
+            // 2 => BVHNodeChild::Element2(objects.remove(0), objects.remove(0)),
             _ => {
                 let main_box_area = main_box.area();
 
@@ -127,16 +196,15 @@ impl BVHNode {
                 let left_objs: Vec<_> = objects.drain(0..(min_cost.0)).collect();
                 let right_objs = objects;
 
-                let left: Box<dyn Hittable> = Box::new(BVHNode::build_using_sah(left_objs));
-                let right: Box<dyn Hittable> = Box::new(BVHNode::build_using_sah(right_objs));
-                (left, Some(right))
+                let left = Box::new(BVHNode::build_using_sah(left_objs));
+                let right = Box::new(BVHNode::build_using_sah(right_objs));
+                BVHNodeChild::Trees(left, right)
             }
         };
 
         BVHNode {
-            left,
-            right,
-            aabb: main_box,
+            child,
+            bounds: main_box,
         }
     }
 }
