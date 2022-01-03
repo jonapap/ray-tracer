@@ -44,13 +44,20 @@ impl<M: Material> Hittable for Sphere<M> {
             }
         }
 
+        let t = root;
+        let p = r.at(t);
+        let outward_normal = (p - self.center) / self.radius;
+        let (u, v) = calc_sphere_uv(&outward_normal);
+
         Some(HitRecord::new(
             root,
-            r.at(root),
-            (r.at(root) - self.center) / self.radius,
+            u,
+            v,
+            p,
+            outward_normal,
             &self.material,
             &r,
-            &((r.at(root) - self.center) / self.radius),
+            &outward_normal,
         ))
     }
 
@@ -60,4 +67,12 @@ impl<M: Material> Hittable for Sphere<M> {
             self.center + Vec3::new(self.radius, self.radius, self.radius),
         ))
     }
+}
+
+fn calc_sphere_uv(p: &Point3) -> (f64, f64) {
+    let pi = std::f64::consts::PI;
+    let theta = (-p.y).acos();
+    let phi = f64::atan2(-p.z, p.x) + pi;
+
+    (phi / (2.0 * pi), theta / pi)
 }

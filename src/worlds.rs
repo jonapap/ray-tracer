@@ -5,6 +5,7 @@ use crate::hit::HittableList;
 use crate::materials::dielectric::Dielectric;
 use crate::materials::lambertian::Lambertian;
 use crate::materials::metal::Metal;
+use crate::materials::textures::SolidColor;
 use crate::random::RNG;
 use crate::ray::Ray;
 use cgmath::InnerSpace;
@@ -21,7 +22,7 @@ fn blue_sky(r: &Ray) -> Color {
 pub fn random_scene1(aspect_ratio: f64) -> Scene {
     let mut world = HittableList::new();
 
-    let ground_material = Lambertian::new(Color::new(0.5, 0.5, 0.5));
+    let ground_material = Lambertian::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -43,7 +44,11 @@ pub fn random_scene1(aspect_ratio: f64) -> Scene {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = rng.random_vector().multiply_with(&rng.random_vector());
-                    world.add(Box::new(Sphere::new(center, 0.2, Lambertian::new(albedo))));
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Lambertian::new(SolidColor::new(albedo)),
+                    )));
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = rng.random_vector_range(0.5..1.0);
@@ -64,7 +69,7 @@ pub fn random_scene1(aspect_ratio: f64) -> Scene {
         material1,
     )));
 
-    let material2 = Lambertian::new(Color::new(0.4, 0.2, 0.1));
+    let material2 = Lambertian::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
     world.add(Box::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
@@ -102,7 +107,7 @@ pub fn simple_scene1(aspect_ratio: f64) -> Scene {
 
     let mut world = HittableList::new();
 
-    let material_ground = Lambertian::new(Color::new(0.8, 0.8, 0.0));
+    let material_ground = Lambertian::new(SolidColor::new((Color::new(0.8, 0.8, 0.0))));
     let material_center = Dielectric::new(1.5);
     let material_left = Dielectric::new(1.5);
     let material_right = Metal::new(Color::new(0.8, 0.6, 0.2), 1.0);

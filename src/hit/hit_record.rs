@@ -5,6 +5,8 @@ use cgmath::dot;
 
 pub struct HitRecord<'a> {
     pub t: f64,
+    pub u: f64,
+    pub v: f64,
     pub p: Point3,
     pub normal: Vec3,
     pub material: &'a dyn Material,
@@ -14,6 +16,8 @@ pub struct HitRecord<'a> {
 impl<'a> HitRecord<'a> {
     pub fn new(
         t: f64,
+        u: f64,
+        v: f64,
         point: Point3,
         normal: Vec3,
         material: &'a dyn Material,
@@ -24,6 +28,8 @@ impl<'a> HitRecord<'a> {
             p: point,
             normal,
             t,
+            u,
+            v,
             material,
             front_face: false,
         };
