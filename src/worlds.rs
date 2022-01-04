@@ -1,6 +1,6 @@
 use crate::base::*;
 use crate::camera::Camera;
-use crate::hit::rectangle::{XYRect, XZRect, YZRect};
+use crate::hit::rectangle::{Cuboid, XYRect, XZRect, YZRect};
 use crate::hit::sphere::Sphere;
 use crate::hit::HittableList;
 use crate::materials::dielectric::Dielectric;
@@ -220,7 +220,25 @@ pub fn cornell_box(aspect_ratio: f64) -> Scene {
         555.0,
         white.clone(),
     )));
-    world.add(Box::new(XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white)));
+    world.add(Box::new(XYRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+
+    world.add(Box::new(Cuboid::new(
+        Point3::new(130.0, 0.0, 65.0),
+        Point3::new(295.0, 165.0, 230.0),
+        white.clone(),
+    )));
+    world.add(Box::new(Cuboid::new(
+        Point3::new(265.0, 0.0, 295.0),
+        Point3::new(430.0, 330.0, 460.0),
+        white.clone(),
+    )));
 
     let cam = Camera::new(
         &Vec3::new(278.0, 278.0, -800.0),

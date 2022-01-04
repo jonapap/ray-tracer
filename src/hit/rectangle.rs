@@ -1,7 +1,7 @@
 use crate::aabb::AABB;
 use crate::base::{Point3, Vec3};
 use crate::hit::hit_record::HitRecord;
-use crate::hit::Hittable;
+use crate::hit::{Hittable, HittableList};
 use crate::materials::Material;
 use crate::ray::Ray;
 use std::sync::Arc;
@@ -171,5 +171,86 @@ impl<M: Material> Hittable for YZRect<M> {
             Point3::new(self.k - 0.001, self.y0, self.z0),
             Point3::new(self.k + 0.001, self.y1, self.z1),
         ))
+    }
+}
+
+// Box
+
+pub struct Cuboid {
+    box_min: Point3,
+    box_max: Point3,
+    sides: HittableList,
+}
+
+impl Cuboid {
+    pub fn new<M: 'static + Material>(box_min: Point3, box_max: Point3, material: Arc<M>) -> Self {
+        let mut sides = HittableList::new();
+
+        sides.add(Box::new(XYRect::new(
+            box_min.x,
+            box_max.x,
+            box_min.y,
+            box_max.y,
+            box_max.z,
+            material.clone(),
+        )));
+        sides.add(Box::new(XYRect::new(
+            box_min.x,
+            box_max.x,
+            box_min.y,
+            box_max.y,
+            box_min.z,
+            material.clone(),
+        )));
+
+        sides.add(Box::new(XZRect::new(
+            box_min.x,
+            box_max.x,
+            box_min.z,
+            box_max.z,
+            box_max.y,
+            material.clone(),
+        )));
+        sides.add(Box::new(XZRect::new(
+            box_min.x,
+            box_max.x,
+            box_min.z,
+            box_max.z,
+            box_min.y,
+            material.clone(),
+        )));
+
+        sides.add(Box::new(YZRect::new(
+            box_min.y,
+            box_max.y,
+            box_min.z,
+            box_max.z,
+            box_max.x,
+            material.clone(),
+        )));
+        sides.add(Box::new(YZRect::new(
+            box_min.y,
+            box_max.y,
+            box_min.z,
+            box_max.z,
+            box_min.x,
+            material.clone(),
+        )));
+
+        Cuboid {
+            sides,
+            box_min,
+            box_max,
+        }
+    }
+}
+
+impl Hittable for Cuboid {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        self.sides.hit(r, t_min, t_max)
+    }
+
+    fn bounding_box(&self) -> Option<AABB> {
+        Some(AABB::new(self.box_min, self.box_max))
     }
 }
