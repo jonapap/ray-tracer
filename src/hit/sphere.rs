@@ -23,7 +23,7 @@ impl<M: Material> Sphere<M> {
     }
 }
 
-impl<M: 'static + Material> Hittable for Sphere<M> {
+impl<M: Material> Hittable for Sphere<M> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.direction.magnitude2();
@@ -55,7 +55,7 @@ impl<M: 'static + Material> Hittable for Sphere<M> {
             u,
             v,
             p,
-            self.material.clone(),
+            self.material.as_ref(),
             &r,
             &outward_normal,
         ))

@@ -30,7 +30,7 @@ impl<M: Material> XYRect<M> {
     }
 }
 
-impl<M: 'static + Material> Hittable for XYRect<M> {
+impl<M: Material> Hittable for XYRect<M> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - r.origin.z) / r.direction.z;
         if t < t_min || t > t_max {
@@ -48,7 +48,7 @@ impl<M: 'static + Material> Hittable for XYRect<M> {
             (x - self.x0) / (self.x1 - self.x0),
             (y - self.y0) / (self.y1 - self.y0),
             r.at(t),
-            self.mp.clone(),
+            self.mp.as_ref(),
             &r,
             &Vec3::new(0.0, 0.0, 1.0),
         ))
@@ -86,7 +86,7 @@ impl<M: Material> XZRect<M> {
     }
 }
 
-impl<M: 'static + Material> Hittable for XZRect<M> {
+impl<M: Material> Hittable for XZRect<M> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - r.origin.y) / r.direction.y;
         if t < t_min || t > t_max {
@@ -104,7 +104,7 @@ impl<M: 'static + Material> Hittable for XZRect<M> {
             (x - self.x0) / (self.x1 - self.x0),
             (z - self.z0) / (self.z1 - self.z0),
             r.at(t),
-            self.mp.clone(),
+            self.mp.as_ref(),
             &r,
             &Vec3::new(0.0, 1.0, 0.0),
         ))
@@ -142,7 +142,7 @@ impl<M: Material> YZRect<M> {
     }
 }
 
-impl<M: 'static + Material> Hittable for YZRect<M> {
+impl<M: Material> Hittable for YZRect<M> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - r.origin.x) / r.direction.x;
         if t < t_min || t > t_max {
@@ -160,7 +160,7 @@ impl<M: 'static + Material> Hittable for YZRect<M> {
             (y - self.y0) / (self.y1 - self.y0),
             (z - self.z0) / (self.z1 - self.z0),
             r.at(t),
-            self.mp.clone(),
+            self.mp.as_ref(),
             &r,
             &Vec3::new(1.0, 0.0, 0.0),
         ))
