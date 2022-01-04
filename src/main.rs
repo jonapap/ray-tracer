@@ -16,7 +16,6 @@ use crate::worlds::random_scene1;
 use clap::{App, Arg};
 use indicatif::{ParallelProgressIterator, ProgressBar};
 use itertools::Itertools;
-use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use rayon::prelude::*;
 use std::time::Instant;

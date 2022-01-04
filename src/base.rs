@@ -2,7 +2,6 @@ use crate::ray::Ray;
 use cgmath::num_traits::clamp;
 use cgmath::{dot, InnerSpace, Vector3};
 use png::*;
-use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use std::cell::RefCell;
 use std::fs::File;

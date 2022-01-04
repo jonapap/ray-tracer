@@ -1,6 +1,6 @@
 use crate::base::Vec3;
 use cgmath::{dot, InnerSpace};
-use rand::rngs::SmallRng;
+use rand::rngs::{SmallRng, ThreadRng};
 use rand::{Rng, SeedableRng};
 use std::ops::Range;
 
@@ -11,7 +11,7 @@ pub struct RNG {
 impl RNG {
     pub fn new() -> RNG {
         RNG {
-            rng: SmallRng::seed_from_u64(1823),
+            rng: SmallRng::from_entropy(),
         }
     }
 
