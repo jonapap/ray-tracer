@@ -1,6 +1,6 @@
 use crate::base::*;
 use crate::camera::Camera;
-use crate::hit::rectangle::XYRect;
+use crate::hit::rectangle::{XYRect, XZRect, YZRect};
 use crate::hit::sphere::Sphere;
 use crate::hit::HittableList;
 use crate::materials::dielectric::Dielectric;
@@ -11,6 +11,7 @@ use crate::materials::textures::SolidColor;
 use crate::random::RNG;
 use crate::ray::Ray;
 use cgmath::InnerSpace;
+use std::sync::Arc;
 
 type Scene = (Camera, HittableList, Background);
 
@@ -24,7 +25,7 @@ fn blue_sky(r: &Ray) -> Color {
 pub fn random_scene1(aspect_ratio: f64) -> Scene {
     let mut world = HittableList::new();
 
-    let ground_material = Lambertian::new(SolidColor::new(Color::new(0.5, 0.5, 0.5)));
+    let ground_material = Arc::new(Lambertian::new(SolidColor::new(Color::new(0.5, 0.5, 0.5))));
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -49,36 +50,44 @@ pub fn random_scene1(aspect_ratio: f64) -> Scene {
                     world.add(Box::new(Sphere::new(
                         center,
                         0.2,
-                        Lambertian::new(SolidColor::new(albedo)),
+                        Arc::new(Lambertian::new(SolidColor::new(albedo))),
                     )));
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = rng.random_vector_range(0.5..1.0);
                     let fuzz = rng.random_double_range(0.0..0.5);
-                    world.add(Box::new(Sphere::new(center, 0.2, Metal::new(albedo, fuzz))));
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Arc::new(Metal::new(albedo, fuzz)),
+                    )));
                 } else {
                     // glass
-                    world.add(Box::new(Sphere::new(center, 0.2, Dielectric::new(1.5))));
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Arc::new(Dielectric::new(1.5)),
+                    )));
                 };
             }
         }
     }
 
-    let material1 = Dielectric::new(1.5);
+    let material1 = Arc::new(Dielectric::new(1.5));
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
         material1,
     )));
 
-    let material2 = Lambertian::new(SolidColor::new(Color::new(0.4, 0.2, 0.1)));
+    let material2 = Arc::new(Lambertian::new(SolidColor::new(Color::new(0.4, 0.2, 0.1))));
     world.add(Box::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         material2,
     )));
 
-    let material3 = Metal::new(Color::new(0.7, 0.6, 0.5), 0.0);
+    let material3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
     world.add(Box::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
@@ -109,10 +118,12 @@ pub fn simple_scene1(aspect_ratio: f64) -> Scene {
 
     let mut world = HittableList::new();
 
-    let material_ground = Lambertian::new(SolidColor::new((Color::new(0.8, 0.8, 0.0))));
-    let material_center = Dielectric::new(1.5);
-    let material_left = Dielectric::new(1.5);
-    let material_right = Metal::new(Color::new(0.8, 0.6, 0.2), 1.0);
+    let material_ground = Arc::new(Lambertian::new(SolidColor::new(
+        (Color::new(0.8, 0.8, 0.0)),
+    )));
+    let material_center = Arc::new(Dielectric::new(1.5));
+    let material_left = Arc::new(Dielectric::new(1.5));
+    let material_right = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
 
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -100.5, -1.0),
@@ -156,15 +167,15 @@ pub fn light_scene(aspect_ratio: f64) -> Scene {
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
-        Lambertian::new(SolidColor::new(Color::new(0.0, 0.8, 0.3))),
+        Arc::new(Lambertian::new(SolidColor::new(Color::new(0.0, 0.8, 0.3)))),
     )));
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, 2.0, 0.0),
         2.0,
-        Lambertian::new(SolidColor::new(Color::new(0.9, 0.0, 0.3))),
+        Arc::new(Lambertian::new(SolidColor::new(Color::new(0.9, 0.0, 0.3)))),
     )));
 
-    let difflight = DiffuseLight::from_color(Color::new(14.0, 14.0, 14.0));
+    let difflight = Arc::new(DiffuseLight::from_color(Color::new(14.0, 14.0, 14.0)));
     world.add(Box::new(XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight)));
 
     let cam = Camera::new(

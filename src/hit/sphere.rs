@@ -5,15 +5,16 @@ use crate::hit::Hittable;
 use crate::materials::Material;
 use crate::ray::Ray;
 use cgmath::{dot, InnerSpace};
+use std::sync::Arc;
 
 pub struct Sphere<M: Material> {
     center: Point3,
     radius: f64,
-    material: M,
+    material: Arc<M>,
 }
 
 impl<M: Material> Sphere<M> {
-    pub fn new(center: Point3, radius: f64, material: M) -> Sphere<M> {
+    pub fn new(center: Point3, radius: f64, material: Arc<M>) -> Sphere<M> {
         Sphere {
             center,
             radius,
@@ -22,7 +23,7 @@ impl<M: Material> Sphere<M> {
     }
 }
 
-impl<M: Material> Hittable for Sphere<M> {
+impl<M: 'static + Material> Hittable for Sphere<M> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.direction.magnitude2();
@@ -54,7 +55,7 @@ impl<M: Material> Hittable for Sphere<M> {
             u,
             v,
             p,
-            &self.material,
+            self.material.clone(),
             &r,
             &outward_normal,
         ))
