@@ -54,7 +54,6 @@ impl<M: Material> Hittable for Sphere<M> {
             u,
             v,
             p,
-            outward_normal,
             &self.material,
             &r,
             &outward_normal,

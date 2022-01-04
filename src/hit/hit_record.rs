@@ -19,14 +19,13 @@ impl<'a> HitRecord<'a> {
         u: f64,
         v: f64,
         point: Point3,
-        normal: Vec3,
         material: &'a dyn Material,
         r: &Ray,
         outward_normal: &Vec3,
     ) -> HitRecord<'a> {
         let tmp = HitRecord {
             p: point,
-            normal,
+            normal: Vec3::new(0.0, 0.0, 0.0), // temporary before we calculate it bellow
             t,
             u,
             v,
