@@ -1,15 +1,27 @@
 use crate::base::{Color, Point3};
 use crate::hit::hit_record::HitRecord;
-use crate::materials::textures::Texture;
+use crate::materials::textures::{SolidColor, Texture};
 use crate::materials::Material;
 use crate::random::RNG;
 use crate::ray::Ray;
 
-pub struct DiffuseLight<'a, T: Texture> {
-    emit: &'a T,
+pub struct DiffuseLight<T: Texture> {
+    emit: T,
 }
 
-impl<'a, T: Texture> Material for DiffuseLight<'a, T> {
+impl<T: Texture> DiffuseLight<T> {
+    pub fn new(emit: T) -> Self {
+        DiffuseLight { emit }
+    }
+}
+
+impl DiffuseLight<SolidColor> {
+    pub fn from_color(color: Color) -> DiffuseLight<SolidColor> {
+        DiffuseLight::<SolidColor>::new(SolidColor::new(color))
+    }
+}
+
+impl<T: Texture> Material for DiffuseLight<T> {
     fn scatter(&self, ray: &Ray, rec: &HitRecord, rng: &mut RNG) -> Option<(Color, Ray)> {
         None
     }

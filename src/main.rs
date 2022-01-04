@@ -32,14 +32,16 @@ fn ray_color<T: Hittable>(
     }
 
     match world.hit(r, 0.001, f64::INFINITY) {
-        Some(rec) => match rec.material.scatter(r, &rec, rng) {
-            Some((color, ray)) => {
-                let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
-
-                emitted + color.multiply_with(&ray_color(&ray, world, depth - 1, background, rng))
+        Some(rec) => {
+            let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
+            match rec.material.scatter(r, &rec, rng) {
+                Some((color, ray)) => {
+                    emitted
+                        + color.multiply_with(&ray_color(&ray, world, depth - 1, background, rng))
+                }
+                None => emitted,
             }
-            None => Color::new(0.0, 0.0, 0.0),
-        },
+        }
         None => background(r),
     }
 }
