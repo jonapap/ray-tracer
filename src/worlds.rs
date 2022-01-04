@@ -1,8 +1,10 @@
 use crate::base::*;
 use crate::camera::Camera;
+use crate::hit::rectangle::XYRect;
 use crate::hit::sphere::Sphere;
 use crate::hit::HittableList;
 use crate::materials::dielectric::Dielectric;
+use crate::materials::diffuse_light::DiffuseLight;
 use crate::materials::lambertian::Lambertian;
 use crate::materials::metal::Metal;
 use crate::materials::textures::SolidColor;
@@ -146,4 +148,35 @@ pub fn simple_scene1(aspect_ratio: f64) -> Scene {
     );
 
     return (cam, world, blue_sky);
+}
+
+pub fn light_scene(aspect_ratio: f64) -> Scene {
+    let mut world = HittableList::new();
+
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Lambertian::new(SolidColor::new(Color::new(0.0, 0.8, 0.3))),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        Lambertian::new(SolidColor::new(Color::new(0.9, 0.0, 0.3))),
+    )));
+
+    let difflight = DiffuseLight::from_color(Color::new(14.0, 14.0, 14.0));
+    world.add(Box::new(XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight)));
+
+    let cam = Camera::new(
+        &Vec3::new(26.0, 3.0, 6.0),
+        &Vec3::new(0.0, 2.0, 0.0),
+        &Vec3::new(0.0, 1.0, 0.0),
+        20.0,
+        aspect_ratio,
+        0.0,
+        10.0,
+    );
+
+    (cam, world, |_| Color::new(0.0, 0.0, 0.0))
+    // (cam, world, blue_sky)
 }
