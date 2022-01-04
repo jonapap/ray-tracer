@@ -1,6 +1,6 @@
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
-use crate::materials::textures::Texture;
+use crate::materials::textures::{SolidColor, Texture};
 use crate::materials::Material;
 use crate::random::RNG;
 use crate::ray::Ray;
@@ -10,8 +10,14 @@ pub struct Lambertian<T: Texture> {
 }
 
 impl<T: Texture> Lambertian<T> {
-    pub fn new(albedo: T) -> Lambertian<T> {
+    pub fn new(albedo: T) -> Self {
         Lambertian { albedo }
+    }
+}
+
+impl Lambertian<SolidColor> {
+    pub fn from_color(color: Color) -> Self {
+        Lambertian::new(SolidColor::new(color))
     }
 }
 
