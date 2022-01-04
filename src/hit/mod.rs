@@ -1,5 +1,6 @@
 pub mod bvh;
 pub mod hit_record;
+pub mod rectangle;
 pub mod sphere;
 
 use crate::aabb::AABB;
