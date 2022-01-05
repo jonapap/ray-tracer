@@ -29,20 +29,20 @@ fn blue_sky(r: &Ray) -> Color {
 }
 
 #[derive(ArgEnum, Clone)]
-pub enum Worlds {
+pub enum Scenes {
     RandomScene1,
     SimpleScene1,
     LightScene,
     CornellBox,
 }
 
-impl Worlds {
+impl Scenes {
     pub fn get_scene(&self) -> Scene {
         match *self {
-            Worlds::RandomScene1 => random_scene1(),
-            Worlds::SimpleScene1 => simple_scene1(),
-            Worlds::LightScene => light_scene(),
-            Worlds::CornellBox => cornell_box(),
+            Scenes::RandomScene1 => random_scene1(),
+            Scenes::SimpleScene1 => simple_scene1(),
+            Scenes::LightScene => light_scene(),
+            Scenes::CornellBox => cornell_box(),
         }
     }
 }

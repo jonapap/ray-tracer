@@ -12,7 +12,7 @@ use crate::bvh::BVHNode;
 use crate::hit::*;
 use crate::random::RNG;
 use crate::ray::Ray;
-use crate::worlds::Worlds;
+use crate::scenes::Scenes;
 
 mod aabb;
 mod base;
@@ -21,7 +21,7 @@ mod hit;
 mod materials;
 mod random;
 mod ray;
-mod worlds;
+mod scenes;
 
 fn ray_color<T: Hittable>(
     r: &Ray,
@@ -53,7 +53,7 @@ fn ray_color<T: Hittable>(
 #[clap(author, version, about)]
 struct Args {
     #[clap(arg_enum)]
-    world: Worlds,
+    scene: Scenes,
 
     #[clap(default_value_t = String::from("out.png"), short, long)]
     output: String,
@@ -69,7 +69,7 @@ fn main() {
     let args = Args::parse();
 
     // Scene
-    let (cam, world, background) = args.world.get_scene();
+    let (cam, world, background) = args.scene.get_scene();
 
     // Image
     let aspect_ratio = cam.get_aspect_ratio();
