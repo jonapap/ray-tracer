@@ -2,6 +2,7 @@ pub mod bvh;
 pub mod hit_record;
 pub mod rectangle;
 pub mod sphere;
+pub mod transform;
 
 use crate::aabb::AABB;
 use crate::base::Point3;

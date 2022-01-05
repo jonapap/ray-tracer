@@ -2,6 +2,7 @@ use crate::base::*;
 use crate::camera::Camera;
 use crate::hit::rectangle::{Cuboid, XYRect, XZRect, YZRect};
 use crate::hit::sphere::Sphere;
+use crate::hit::transform::Translate;
 use crate::hit::HittableList;
 use crate::materials::dielectric::Dielectric;
 use crate::materials::diffuse_light::DiffuseLight;
@@ -10,6 +11,7 @@ use crate::materials::metal::Metal;
 use crate::materials::textures::SolidColor;
 use crate::random::RNG;
 use crate::ray::Ray;
+use crate::transform::RotateY;
 use cgmath::InnerSpace;
 use std::sync::Arc;
 
@@ -229,16 +231,23 @@ pub fn cornell_box(aspect_ratio: f64) -> Scene {
         white.clone(),
     )));
 
-    world.add(Box::new(Cuboid::new(
-        Point3::new(130.0, 0.0, 65.0),
-        Point3::new(295.0, 165.0, 230.0),
+    let box1 = Cuboid::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 330.0, 165.0),
         white.clone(),
-    )));
-    world.add(Box::new(Cuboid::new(
-        Point3::new(265.0, 0.0, 295.0),
-        Point3::new(430.0, 330.0, 460.0),
+    );
+    let box1 = RotateY::new(box1, 15.0);
+    let box1 = Translate::new(box1, Vec3::new(265.0, 0.0, 295.0));
+    world.add(Box::new(box1));
+
+    let box2 = Cuboid::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 165.0, 165.0),
         white.clone(),
-    )));
+    );
+    let box2 = RotateY::new(box2, -18.0);
+    let box2 = Translate::new(box2, Vec3::new(130.0, 0.0, 65.0));
+    world.add(Box::new(box2));
 
     let cam = Camera::new(
         &Vec3::new(278.0, 278.0, -800.0),
