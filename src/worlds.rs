@@ -1,5 +1,6 @@
 use crate::base::*;
 use crate::camera::Camera;
+use crate::hit::constant_medium::ConstantMedium;
 use crate::hit::rectangle::{Cuboid, XYRect, XZRect, YZRect};
 use crate::hit::sphere::Sphere;
 use crate::hit::transform::Translate;
@@ -238,6 +239,7 @@ pub fn cornell_box(aspect_ratio: f64) -> Scene {
     );
     let box1 = RotateY::new(box1, 15.0);
     let box1 = Translate::new(box1, Vec3::new(265.0, 0.0, 295.0));
+    let box1 = ConstantMedium::new_from_color(box1, 0.01, Color::new(1.0, 1.0, 1.0));
     world.add(Box::new(box1));
 
     let box2 = Cuboid::new(

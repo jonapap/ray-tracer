@@ -1,4 +1,5 @@
 pub mod bvh;
+pub mod constant_medium;
 pub mod hit_record;
 pub mod rectangle;
 pub mod sphere;
