@@ -12,7 +12,7 @@ use crate::bvh::BVHNode;
 use crate::hit::*;
 use crate::random::RNG;
 use crate::ray::Ray;
-use crate::worlds::random_scene1;
+use crate::worlds::{cornell_box, light_scene, random_scene1};
 use clap::{App, Arg};
 use indicatif::{ParallelProgressIterator, ProgressBar};
 use itertools::Itertools;
@@ -60,15 +60,17 @@ fn main() {
         )
         .get_matches();
 
+    // World
+    let (cam, world, background) = cornell_box();
+
     // Image
-    let aspect_ratio = 3.0 / 2.0;
-    let image_width = 400;
+    let aspect_ratio = cam.get_aspect_ratio();
+    let image_width = 600;
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 200;
     let max_depth = 50;
 
-    let (cam, world, background) = random_scene1(aspect_ratio);
-
+    // Progress Bar
     let bar = ProgressBar::new((image_height * image_width) as u64);
     bar.set_style(
         indicatif::ProgressStyle::default_bar()
@@ -93,7 +95,6 @@ fn main() {
             let mut rng = RNG::new();
 
             (0..samples_per_pixel)
-                // .into_iter()
                 .map(|_| {
                     let u = ((i as f64) + rng.random_double()) / (image_width - 1) as f64;
                     let v = ((j as f64) + rng.random_double()) / (image_height - 1) as f64;

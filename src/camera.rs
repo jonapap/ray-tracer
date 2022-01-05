@@ -12,6 +12,7 @@ pub struct Camera {
     v: Vec3,
     w: Vec3,
     lens_radius: f64,
+    aspect_ratio: f64,
 }
 
 impl Camera {
@@ -39,6 +40,7 @@ impl Camera {
         let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - focus_dist * w;
 
         Camera {
+            aspect_ratio,
             origin,
             horizontal,
             vertical,
@@ -58,5 +60,9 @@ impl Camera {
             self.origin + offset,
             self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset,
         )
+    }
+
+    pub fn get_aspect_ratio(&self) -> f64 {
+        self.aspect_ratio
     }
 }

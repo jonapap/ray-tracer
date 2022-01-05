@@ -25,7 +25,7 @@ fn blue_sky(r: &Ray) -> Color {
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
 
-pub fn random_scene1(aspect_ratio: f64) -> Scene {
+pub fn random_scene1() -> Scene {
     let mut world = HittableList::new();
 
     let ground_material = Arc::new(Lambertian::new(SolidColor::new(Color::new(0.5, 0.5, 0.5))));
@@ -108,7 +108,7 @@ pub fn random_scene1(aspect_ratio: f64) -> Scene {
         &lookat,
         &vup,
         20.0,
-        aspect_ratio,
+        3.0 / 2.0,
         aperture,
         dist_to_focus,
     );
@@ -116,7 +116,7 @@ pub fn random_scene1(aspect_ratio: f64) -> Scene {
     return (cam, world, blue_sky);
 }
 
-pub fn simple_scene1(aspect_ratio: f64) -> Scene {
+pub fn simple_scene1() -> Scene {
     // World
 
     let mut world = HittableList::new();
@@ -156,7 +156,7 @@ pub fn simple_scene1(aspect_ratio: f64) -> Scene {
         &Vec3::new(0.0, 0.0, -1.0),
         &Vec3::new(0.0, 1.0, 0.0),
         90.0,
-        aspect_ratio,
+        3.0 / 2.0,
         0.1,
         1.0,
     );
@@ -164,7 +164,7 @@ pub fn simple_scene1(aspect_ratio: f64) -> Scene {
     return (cam, world, blue_sky);
 }
 
-pub fn light_scene(aspect_ratio: f64) -> Scene {
+pub fn light_scene() -> Scene {
     let mut world = HittableList::new();
 
     world.add(Box::new(Sphere::new(
@@ -186,7 +186,7 @@ pub fn light_scene(aspect_ratio: f64) -> Scene {
         &Vec3::new(0.0, 2.0, 0.0),
         &Vec3::new(0.0, 1.0, 0.0),
         20.0,
-        aspect_ratio,
+        3.0 / 2.0,
         0.0,
         10.0,
     );
@@ -194,7 +194,7 @@ pub fn light_scene(aspect_ratio: f64) -> Scene {
     (cam, world, |_| Color::new(0.0, 0.0, 0.0))
 }
 
-pub fn cornell_box(aspect_ratio: f64) -> Scene {
+pub fn cornell_box() -> Scene {
     let mut world = HittableList::new();
 
     let red = Arc::new(Lambertian::from_color(Color::new(0.65, 0.05, 0.05)));
@@ -256,7 +256,7 @@ pub fn cornell_box(aspect_ratio: f64) -> Scene {
         &Vec3::new(278.0, 278.0, 0.0),
         &Vec3::new(0.0, 1.0, 0.0),
         40.0,
-        aspect_ratio,
+        1.0,
         0.0,
         10.0,
     );
