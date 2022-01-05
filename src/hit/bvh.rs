@@ -15,16 +15,16 @@ pub struct BVHNode {
 }
 
 impl Hittable for BVHNode {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
         if !self.aabb.hit(r, t_min, t_max) {
             return None;
         }
 
-        let hit_left = self.left.hit(r, t_min, t_max);
+        let hit_left = self.left.hit(r, t_min, t_max, rng);
 
         let hit_right = match (&hit_left, &self.right) {
-            (Some(a), Some(right)) => right.hit(r, t_min, a.t),
-            (None, Some(right)) => right.hit(r, t_min, t_max),
+            (Some(a), Some(right)) => right.hit(r, t_min, a.t, rng),
+            (None, Some(right)) => right.hit(r, t_min, t_max, rng),
             _ => None,
         };
 

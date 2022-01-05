@@ -7,13 +7,14 @@ pub mod transform;
 use crate::aabb::AABB;
 use crate::base::Point3;
 use crate::hit::hit_record::HitRecord;
+use crate::random::RNG;
 use crate::ray::Ray;
 use itertools::Itertools;
 
 // Hittable
 
 pub trait Hittable: Sync {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord>;
     fn bounding_box(&self) -> Option<AABB>;
 }
 
@@ -34,12 +35,12 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
         let mut rec = None;
         let mut closest_so_far = t_max;
 
         for object in &self.list {
-            match object.hit(r, t_min, closest_so_far) {
+            match object.hit(r, t_min, closest_so_far, rng) {
                 None => {}
                 Some(obj) => {
                     closest_so_far = obj.t;

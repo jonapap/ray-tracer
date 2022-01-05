@@ -31,7 +31,7 @@ fn ray_color<T: Hittable>(
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    match world.hit(r, 0.001, f64::INFINITY) {
+    match world.hit(r, 0.001, f64::INFINITY, rng) {
         Some(rec) => {
             let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
             match rec.material.scatter(r, &rec, rng) {

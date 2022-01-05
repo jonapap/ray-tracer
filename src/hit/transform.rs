@@ -2,6 +2,7 @@ use crate::aabb::AABB;
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::hit::Hittable;
+use crate::random::RNG;
 use crate::ray::Ray;
 use cgmath::num_traits::Float;
 use itertools::Itertools;
@@ -21,10 +22,10 @@ impl<H: Hittable> Translate<H> {
 }
 
 impl<H: Hittable> Hittable for Translate<H> {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
         let moved_r = Ray::new(r.origin - self.offset, r.direction);
 
-        self.obj.hit(&moved_r, t_min, t_max).map(|hit| {
+        self.obj.hit(&moved_r, t_min, t_max, rng).map(|hit| {
             HitRecord::new(
                 hit.t,
                 hit.u,
@@ -105,13 +106,13 @@ impl<H: Hittable> RotateY<H> {
 }
 
 impl<H: Hittable> Hittable for RotateY<H> {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
         let origin_rotated = self.rotate_around_y_rev(r.origin);
         let direction_rotated = self.rotate_around_y_rev(r.direction);
 
         let rotated_r = Ray::new(origin_rotated, direction_rotated);
 
-        self.obj.hit(&rotated_r, t_min, t_max).map(|hit| {
+        self.obj.hit(&rotated_r, t_min, t_max, rng).map(|hit| {
             HitRecord::new(
                 hit.t,
                 hit.u,

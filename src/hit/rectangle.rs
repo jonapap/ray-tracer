@@ -3,6 +3,7 @@ use crate::base::{Point3, Vec3};
 use crate::hit::hit_record::HitRecord;
 use crate::hit::{Hittable, HittableList};
 use crate::materials::Material;
+use crate::random::RNG;
 use crate::ray::Ray;
 use std::sync::Arc;
 
@@ -31,7 +32,7 @@ impl<M: Material> XYRect<M> {
 }
 
 impl<M: Material> Hittable for XYRect<M> {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
         let t = (self.k - r.origin.z) / r.direction.z;
         if t < t_min || t > t_max {
             return None;
@@ -87,7 +88,7 @@ impl<M: Material> XZRect<M> {
 }
 
 impl<M: Material> Hittable for XZRect<M> {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
         let t = (self.k - r.origin.y) / r.direction.y;
         if t < t_min || t > t_max {
             return None;
@@ -143,7 +144,7 @@ impl<M: Material> YZRect<M> {
 }
 
 impl<M: Material> Hittable for YZRect<M> {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
         let t = (self.k - r.origin.x) / r.direction.x;
         if t < t_min || t > t_max {
             return None;
@@ -246,8 +247,8 @@ impl Cuboid {
 }
 
 impl Hittable for Cuboid {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        self.sides.hit(r, t_min, t_max)
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
+        self.sides.hit(r, t_min, t_max, rng)
     }
 
     fn bounding_box(&self) -> Option<AABB> {
