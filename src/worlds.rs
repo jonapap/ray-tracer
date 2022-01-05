@@ -14,6 +14,7 @@ use crate::random::RNG;
 use crate::ray::Ray;
 use crate::transform::RotateY;
 use cgmath::InnerSpace;
+use clap::ArgEnum;
 use std::sync::Arc;
 
 type Scene = (Camera, HittableList, Background);
@@ -25,7 +26,26 @@ fn blue_sky(r: &Ray) -> Color {
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
 
-pub fn random_scene1() -> Scene {
+#[derive(ArgEnum, Clone)]
+pub enum Worlds {
+    RandomScene1,
+    SimpleScene1,
+    LightScene,
+    CornellBox,
+}
+
+impl Worlds {
+    pub fn get_scene(&self) -> Scene {
+        match *self {
+            Worlds::RandomScene1 => random_scene1(),
+            Worlds::SimpleScene1 => simple_scene1(),
+            Worlds::LightScene => light_scene(),
+            Worlds::CornellBox => cornell_box(),
+        }
+    }
+}
+
+fn random_scene1() -> Scene {
     let mut world = HittableList::new();
 
     let ground_material = Arc::new(Lambertian::new(SolidColor::new(Color::new(0.5, 0.5, 0.5))));
@@ -116,7 +136,7 @@ pub fn random_scene1() -> Scene {
     return (cam, world, blue_sky);
 }
 
-pub fn simple_scene1() -> Scene {
+fn simple_scene1() -> Scene {
     // World
 
     let mut world = HittableList::new();
@@ -164,7 +184,7 @@ pub fn simple_scene1() -> Scene {
     return (cam, world, blue_sky);
 }
 
-pub fn light_scene() -> Scene {
+fn light_scene() -> Scene {
     let mut world = HittableList::new();
 
     world.add(Box::new(Sphere::new(
@@ -194,7 +214,7 @@ pub fn light_scene() -> Scene {
     (cam, world, |_| Color::new(0.0, 0.0, 0.0))
 }
 
-pub fn cornell_box() -> Scene {
+fn cornell_box() -> Scene {
     let mut world = HittableList::new();
 
     let red = Arc::new(Lambertian::from_color(Color::new(0.65, 0.05, 0.05)));

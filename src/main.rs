@@ -12,7 +12,8 @@ use crate::bvh::BVHNode;
 use crate::hit::*;
 use crate::random::RNG;
 use crate::ray::Ray;
-use crate::worlds::{cornell_box, light_scene, random_scene1};
+use crate::worlds::Worlds;
+use clap::Parser;
 use clap::{App, Arg};
 use indicatif::{ParallelProgressIterator, ProgressBar};
 use itertools::Itertools;
@@ -46,28 +47,33 @@ fn ray_color<T: Hittable>(
     }
 }
 
-fn main() {
-    let matches = App::new("Ray-Tracer Engine")
-        .version("1.0")
-        .author("Jonathan Papineau <hello@jontech.app>")
-        .arg(
-            Arg::with_name("output")
-                .short("o")
-                .long("output")
-                .help("Output file")
-                .takes_value(true)
-                .default_value("out.png"),
-        )
-        .get_matches();
+#[derive(Parser)]
+#[clap(author, version, about)]
+struct Args {
+    #[clap(arg_enum)]
+    world: Worlds,
 
-    // World
-    let (cam, world, background) = cornell_box();
+    #[clap(default_value_t = String::from("out.png"), short, long)]
+    output: String,
+
+    #[clap(default_value_t = 600, short = 'w', long)]
+    image_width: u32,
+
+    #[clap(default_value_t = 200, short, long)]
+    samples_per_pixel: u32,
+}
+
+fn main() {
+    let args = Args::parse();
+
+    // Scene
+    let (cam, world, background) = args.world.get_scene();
 
     // Image
     let aspect_ratio = cam.get_aspect_ratio();
-    let image_width = 600;
-    let image_height = ((image_width as f64) / aspect_ratio) as i32;
-    let samples_per_pixel = 200;
+    let image_width = args.image_width;
+    let image_height = ((image_width as f64) / aspect_ratio) as u32;
+    let samples_per_pixel = args.samples_per_pixel;
     let max_depth = 50;
 
     // Progress Bar
@@ -111,7 +117,7 @@ fn main() {
         samples_per_pixel,
         image_width as u32,
         (image_height - 1) as u32,
-        matches.value_of("output").unwrap(),
+        &args.output,
     );
 
     println!("Done! Rendered in {:?}", start.elapsed());
