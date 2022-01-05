@@ -22,7 +22,7 @@ impl Isotropic<SolidColor> {
 }
 
 impl<T: Texture> Material for Isotropic<T> {
-    fn scatter(&self, ray: &Ray, rec: &HitRecord, rng: &mut RNG) -> Option<(Color, Ray)> {
+    fn scatter(&self, _ray: &Ray, rec: &HitRecord, rng: &mut RNG) -> Option<(Color, Ray)> {
         Some((
             self.albedo.value(rec.u, rec.v, &rec.p),
             Ray::new(rec.p, rng.random_in_unit_sphere()),

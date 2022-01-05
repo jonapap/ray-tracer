@@ -1,3 +1,19 @@
+#![allow(dead_code)]
+
+use std::time::Instant;
+
+use clap::Parser;
+use indicatif::{ParallelProgressIterator, ProgressBar};
+use itertools::Itertools;
+use rayon::prelude::*;
+
+use crate::base::*;
+use crate::bvh::BVHNode;
+use crate::hit::*;
+use crate::random::RNG;
+use crate::ray::Ray;
+use crate::worlds::Worlds;
+
 mod aabb;
 mod base;
 mod camera;
@@ -6,20 +22,6 @@ mod materials;
 mod random;
 mod ray;
 mod worlds;
-
-use crate::base::*;
-use crate::bvh::BVHNode;
-use crate::hit::*;
-use crate::random::RNG;
-use crate::ray::Ray;
-use crate::worlds::Worlds;
-use clap::Parser;
-use clap::{App, Arg};
-use indicatif::{ParallelProgressIterator, ProgressBar};
-use itertools::Itertools;
-use rand::{Rng, SeedableRng};
-use rayon::prelude::*;
-use std::time::Instant;
 
 fn ray_color<T: Hittable>(
     r: &Ray,

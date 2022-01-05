@@ -1,12 +1,11 @@
+use std::cmp::Ordering;
+
 use crate::aabb::AABB;
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::hit::{Hittable, HittableList};
 use crate::random::RNG;
 use crate::ray::Ray;
-use itertools::Itertools;
-use std::cmp::Ordering;
-use std::error::Error;
 
 pub struct BVHNode {
     left: Box<dyn Hittable>,

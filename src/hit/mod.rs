@@ -1,16 +1,14 @@
+use crate::aabb::AABB;
+use crate::hit::hit_record::HitRecord;
+use crate::random::RNG;
+use crate::ray::Ray;
+
 pub mod bvh;
 pub mod constant_medium;
 pub mod hit_record;
 pub mod rectangle;
 pub mod sphere;
 pub mod transform;
-
-use crate::aabb::AABB;
-use crate::base::Point3;
-use crate::hit::hit_record::HitRecord;
-use crate::random::RNG;
-use crate::ray::Ray;
-use itertools::Itertools;
 
 // Hittable
 

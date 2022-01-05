@@ -1,12 +1,12 @@
+use itertools::Itertools;
+use itertools::MinMaxResult::MinMax;
+
 use crate::aabb::AABB;
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::hit::Hittable;
 use crate::random::RNG;
 use crate::ray::Ray;
-use cgmath::num_traits::Float;
-use itertools::Itertools;
-use itertools::MinMaxResult::MinMax;
 
 // Translate
 

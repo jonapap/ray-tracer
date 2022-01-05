@@ -1,8 +1,10 @@
-use crate::base::Vec3;
-use cgmath::{dot, InnerSpace};
-use rand::rngs::{SmallRng, ThreadRng};
-use rand::{Rng, SeedableRng};
 use std::ops::Range;
+
+use cgmath::{dot, InnerSpace};
+use rand::rngs::SmallRng;
+use rand::{Rng, SeedableRng};
+
+use crate::base::Vec3;
 
 pub struct RNG {
     rng: SmallRng,

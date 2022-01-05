@@ -1,14 +1,12 @@
-use crate::ray::Ray;
+use std::fs::File;
+use std::io::BufWriter;
+use std::path::Path;
+
 use cgmath::num_traits::clamp;
 use cgmath::{dot, InnerSpace, Vector3};
 use png::*;
-use rand::{Rng, SeedableRng};
-use std::cell::RefCell;
-use std::fs::File;
-use std::io::BufWriter;
-use std::ops;
-use std::ops::Range;
-use std::path::Path;
+
+use crate::ray::Ray;
 
 pub type Background = fn(&Ray) -> Color;
 

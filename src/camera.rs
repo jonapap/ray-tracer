@@ -1,7 +1,8 @@
+use cgmath::InnerSpace;
+
 use crate::base::*;
 use crate::random::RNG;
 use crate::ray::Ray;
-use cgmath::InnerSpace;
 
 pub struct Camera {
     origin: Point3,

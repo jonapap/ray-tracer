@@ -22,7 +22,7 @@ impl DiffuseLight<SolidColor> {
 }
 
 impl<T: Texture> Material for DiffuseLight<T> {
-    fn scatter(&self, ray: &Ray, rec: &HitRecord, rng: &mut RNG) -> Option<(Color, Ray)> {
+    fn scatter(&self, _ray: &Ray, _rec: &HitRecord, _rng: &mut RNG) -> Option<(Color, Ray)> {
         None
     }
 

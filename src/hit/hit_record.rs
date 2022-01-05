@@ -1,8 +1,8 @@
+use cgmath::dot;
+
 use crate::base::*;
 use crate::materials::Material;
 use crate::ray::Ray;
-use cgmath::dot;
-use std::sync::Arc;
 
 pub struct HitRecord<'a> {
     pub t: f64,

@@ -1,9 +1,10 @@
+use cgmath::{dot, InnerSpace};
+
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
 use crate::materials::Material;
 use crate::random::RNG;
 use crate::ray::Ray;
-use cgmath::{dot, InnerSpace};
 
 pub struct Metal {
     albedo: Color,

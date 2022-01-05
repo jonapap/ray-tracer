@@ -1,15 +1,14 @@
+use cgmath::num_traits::Float;
+use cgmath::InnerSpace;
+
 use crate::aabb::AABB;
 use crate::base::{Color, Vec3};
 use crate::hit::hit_record::HitRecord;
 use crate::hit::Hittable;
 use crate::materials::isotropic::Isotropic;
 use crate::materials::textures::{SolidColor, Texture};
-use crate::materials::Material;
 use crate::random::RNG;
 use crate::ray::Ray;
-use cgmath::num_traits::Float;
-use cgmath::InnerSpace;
-use std::sync::Arc;
 
 pub struct ConstantMedium<H: Hittable, T: Texture> {
     boundary: H,
@@ -26,6 +25,7 @@ impl<H: Hittable, T: Texture> ConstantMedium<H, T> {
         }
     }
 }
+
 impl<H: Hittable> ConstantMedium<H, SolidColor> {
     pub fn new_from_color(boundary: H, d: f64, color: Color) -> Self {
         ConstantMedium {

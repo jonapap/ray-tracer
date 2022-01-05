@@ -1,3 +1,7 @@
+use std::sync::Arc;
+
+use cgmath::{dot, InnerSpace};
+
 use crate::aabb::AABB;
 use crate::base::*;
 use crate::hit::hit_record::HitRecord;
@@ -5,8 +9,6 @@ use crate::hit::Hittable;
 use crate::materials::Material;
 use crate::random::RNG;
 use crate::ray::Ray;
-use cgmath::{dot, InnerSpace};
-use std::sync::Arc;
 
 pub struct Sphere<M: Material> {
     center: Point3,
@@ -25,7 +27,7 @@ impl<M: Material> Sphere<M> {
 }
 
 impl<M: Material> Hittable for Sphere<M> {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, rng: &mut RNG) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64, _rng: &mut RNG) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.direction.magnitude2();
         let half_b = dot(oc, r.direction);

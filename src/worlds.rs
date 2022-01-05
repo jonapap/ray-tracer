@@ -1,3 +1,8 @@
+use std::sync::Arc;
+
+use cgmath::InnerSpace;
+use clap::ArgEnum;
+
 use crate::base::*;
 use crate::camera::Camera;
 use crate::hit::constant_medium::ConstantMedium;
@@ -13,9 +18,6 @@ use crate::materials::textures::SolidColor;
 use crate::random::RNG;
 use crate::ray::Ray;
 use crate::transform::RotateY;
-use cgmath::InnerSpace;
-use clap::ArgEnum;
-use std::sync::Arc;
 
 type Scene = (Camera, HittableList, Background);
 
@@ -141,9 +143,7 @@ fn simple_scene1() -> Scene {
 
     let mut world = HittableList::new();
 
-    let material_ground = Arc::new(Lambertian::new(SolidColor::new(
-        (Color::new(0.8, 0.8, 0.0)),
-    )));
+    let material_ground = Arc::new(Lambertian::new(SolidColor::new(Color::new(0.8, 0.8, 0.0))));
     let material_center = Arc::new(Dielectric::new(1.5));
     let material_left = Arc::new(Dielectric::new(1.5));
     let material_right = Arc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
